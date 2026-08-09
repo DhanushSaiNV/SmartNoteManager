@@ -1,13 +1,7 @@
 from cli import make_dim, make_branding
 
 """
-TODO: Take user opt input and run corresponding opt method in NoteManager.
-PROBLEM: How to perform operation after taking opt number as input: 
-    - use match case in a perform_operation func, and perform operation wrt operation number
-        -- but how do we get the required arguments needed for the operation func to run?
-        Issue: this causes calling the methods of NoteManager in perform_operation func which is a method of it too. 
-    - SOL: Provide the functionalities to the main, where main handles the actual operation calling. 
-        -- Should provide the opts dict
+TODO: Implement `create_note()`
 """
 
 class NoteManager:
@@ -19,6 +13,7 @@ class NoteManager:
     menu = "\n" + make_branding("Note Manager") + "\n" 
 
     def __init__(self):
+        
         pass
 
 
@@ -42,7 +37,9 @@ class NoteManager:
         if not input or input not in range(1, len(cls.OPTS_L) + 1):
             raise ValueError("Invalid input: Enter valid operation number [1/2/3/4/5/6]")
 
-    
+
+    def create_note(self):
+        pass    
    
 
     
