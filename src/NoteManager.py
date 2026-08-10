@@ -4,6 +4,8 @@ from datetime import datetime, timezone
 import re as regex
 import json
 import uuid
+import tempfile
+import os
 
 import cli
 import utils
@@ -70,17 +72,23 @@ class NoteManager:
             "modified_at": datetime_str,
         }
 
-        # FIX: file writing partially stopping when an exception occurs, causing failed partial files being saved.
-        try: 
-            # create a json file
-            with open(self.NOTES_DIR / f"{file_name}.json", "x") as file:
-                json.dump(content_dict, file, indent=4)
+        with tempfile.NamedTemporaryFile("w", dir=self.NOTES_DIR, delete=False) as temp_file:
+            temp_path = temp_file.name
 
-        except FileExistsError as e:
-            raise TitleAlreadyUsedError(f"Title already used: {e}") from e
-        except Exception as e:
-            raise FileSaveError(f"Failed to save note: {e}") from e
+            try:
+                json.dump(content_dict, temp_file, indent=4)
 
+                # Force the OS to flush memory buffers completely to disk
+                temp_file.flush()
+                os.fsync(temp_file.fileno())
+
+            except Exception as e:
+                temp_file.close()
+                os.remove(temp_path)
+
+                raise FileSaveError(f"Failed to save note: {e}") from e
+
+        os.replace(temp_path, self.NOTES_DIR / f"{file_name}.json")
 
         return data, file_name, str(self.NOTES_DIR / f"{file_name}.json")
 
