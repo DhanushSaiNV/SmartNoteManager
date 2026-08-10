@@ -63,7 +63,7 @@ class NoteManager:
         content_dict = {
             "id": str(id),
             "title": title,
-            "tag": tag if tag != None or tag != "" else None,
+            "tag": tag.strip() if tag else None,
             "note": data,
             "created_at": datetime_str,
             "modified_at": datetime_str,
@@ -87,11 +87,15 @@ class NoteManager:
 
 
         file_name = str(id)
+        file_path = self.NOTES_DIR / f"{file_name}.json"
 
-        os.replace(temp_path, self.NOTES_DIR / f"{file_name}.json")
+        os.replace(temp_path, file_path)
 
-        return data, file_name, str(self.NOTES_DIR / f"{file_name}.json")
+        return data, file_name, file_path
+    
 
+    def search_note(self, *phrases):
+        pass
     
         
             
