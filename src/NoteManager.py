@@ -5,14 +5,11 @@ import re as regex
 import json
 
 import cli
+import utils
 from exceptions import FileSaveError, TitleAlreadyUsedError
 
 """
-TODO: Implement `create_note()`
-    # - Create./ Get a DATA_DIR
-    # - Create / Get "/Notes" dir from DATA_DIR
-    - Write user notes in new file: after validation and formatting
-    - Save the file and return file path. 
+TODO: 
 """
 
 class NoteManager:
@@ -60,12 +57,11 @@ class NoteManager:
 
         file_name = regex.sub(r"\W", "", title or data[0:15])
 
-        utc_now = datetime.now(timezone.utc)
-        iso_string = utc_now.isoformat()
+        datetime_str = utils.get_datetime()
 
         content_dict = {
-            "created_at": iso_string,
-            "modified_at": iso_string,
+            "created_at": datetime_str,
+            "modified_at": datetime_str,
             "note": data,
             "title": title,
             "tag": tag if tag != None or tag != "" else None,
@@ -75,6 +71,7 @@ class NoteManager:
             # create a json file
             with open(self.NOTES_DIR / f"{file_name}.json", "x") as file:
                 json.dump(content_dict, file, indent=4)
+                
         except FileExistsError as e:
             raise TitleAlreadyUsedError("Title already used.")
         except Exception as e:
@@ -82,6 +79,8 @@ class NoteManager:
 
 
         return data, file_name, str(self.NOTES_DIR / f"{file_name}.json")
+
+    
         
             
    
