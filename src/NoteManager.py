@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 import re as regex
 import json
 
-from cli import make_dim, make_branding
+import cli
 from exceptions import FileSaveError, TitleAlreadyUsedError
 
 """
@@ -16,12 +16,9 @@ TODO: Implement `create_note()`
 """
 
 class NoteManager:
-    OPTS_L = ["Create Note", "Search Note", "View Stats", "Export Data", "Remove Data", "Quit"]
-    OPTS = {
-        i + 1: opt for i, opt in enumerate(OPTS_L)
-    }
+    OPTS, OPTS_L = cli.get_opts()
 
-    menu = "\n" + make_branding("Note Manager") + "\n" 
+    menu = "\n" + cli.make_branding("Note Manager") + "\n" 
 
 
     def __init__(self):
@@ -43,7 +40,7 @@ class NoteManager:
         menu = cls.menu + "\n"
 
         for opt_number, opt in cls.OPTS.items():
-            menu += f"  {make_dim(str(opt_number))}. {make_dim(opt.title())}\n"
+            menu += f"  {cli.make_dim(str(opt_number))}. {cli.make_dim(opt.title())}\n"
         menu += "\n\033[1mChoose an operation:\033[0m" 
 
         return menu
