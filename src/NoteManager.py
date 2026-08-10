@@ -3,6 +3,7 @@ from platformdirs import user_data_dir
 from datetime import datetime, timezone
 import re as regex
 import json
+import uuid
 
 import cli
 import utils
@@ -13,11 +14,6 @@ TODO:
 """
 
 class NoteManager:
-    OPTS, OPTS_L = cli.get_opts()
-
-    menu = "\n" + cli.make_branding("Note Manager") + "\n" 
-
-
     def __init__(self):
         # create or get user DATA_DIR
         self.DATA_DIR = Path(user_data_dir("SmartNoteManager"))
@@ -26,6 +22,10 @@ class NoteManager:
         self.DATA_DIR.mkdir(parents=True, exist_ok=True)
         self.NOTES_DIR.mkdir(parents=True, exist_ok=True)
 
+
+    OPTS, OPTS_L = cli.get_opts()
+
+    menu = "\n" + cli.make_branding("Note Manager") + "\n" 
 
 
     @classmethod
@@ -59,23 +59,27 @@ class NoteManager:
 
         datetime_str = utils.get_datetime()
 
+        id = uuid.uuid4()
+
         content_dict = {
-            "created_at": datetime_str,
-            "modified_at": datetime_str,
-            "note": data,
+            "id": str(id),
             "title": title,
             "tag": tag if tag != None or tag != "" else None,
+            "note": data,
+            "created_at": datetime_str,
+            "modified_at": datetime_str,
         }
 
+        # FIX: file writing partially stopping when an exception occurs, causing failed partial files being saved.
         try: 
             # create a json file
             with open(self.NOTES_DIR / f"{file_name}.json", "x") as file:
                 json.dump(content_dict, file, indent=4)
-                
+
         except FileExistsError as e:
-            raise TitleAlreadyUsedError("Title already used.")
+            raise TitleAlreadyUsedError(f"Title already used: {e}") from e
         except Exception as e:
-            raise FileSaveError("Failed to save note.") from e
+            raise FileSaveError(f"Failed to save note: {e}") from e
 
 
         return data, file_name, str(self.NOTES_DIR / f"{file_name}.json")
