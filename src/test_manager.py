@@ -4,7 +4,7 @@ from exceptions import FileSaveError
 nm = NoteManager()
 
 try: 
-    data, file_name, file_path = nm.create_note("this is a\b note,jf", title="error test!!!")
+    data, file_name, file_path = nm.create_note("todo: complete next method in the project by tonight.", title="error test!!!")
 except FileSaveError as e:
     print(e)
 else:

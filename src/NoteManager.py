@@ -1,7 +1,6 @@
 from pathlib import Path
 from platformdirs import user_data_dir
 from datetime import datetime, timezone
-import re as regex
 import json
 import uuid
 import tempfile
@@ -12,7 +11,7 @@ import utils
 from exceptions import FileSaveError, TitleAlreadyUsedError
 
 """
-TODO: 
+TODO: Implement note search
 """
 
 class NoteManager:
@@ -57,11 +56,9 @@ class NoteManager:
 
         data = note_data.strip()
 
-        file_name = regex.sub(r"\W", "", title or data[0:15])
+        id = uuid.uuid4().hex
 
         datetime_str = utils.get_datetime()
-
-        id = uuid.uuid4()
 
         content_dict = {
             "id": str(id),
@@ -87,6 +84,9 @@ class NoteManager:
                 os.remove(temp_path)
 
                 raise FileSaveError(f"Failed to save note: {e}") from e
+
+
+        file_name = str(id)
 
         os.replace(temp_path, self.NOTES_DIR / f"{file_name}.json")
 
