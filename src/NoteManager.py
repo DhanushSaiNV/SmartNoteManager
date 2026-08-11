@@ -5,6 +5,7 @@ import json
 import uuid
 import tempfile
 import os
+import re
 
 import cli
 import utils
@@ -62,7 +63,7 @@ class NoteManager:
 
         content_dict = {
             "id": str(id),
-            "title": title,
+            "title": title.strip() if title else None,
             "tag": tag.strip() if tag else None,
             "note": data,
             "created_at": datetime_str,
@@ -94,8 +95,34 @@ class NoteManager:
         return data, file_name, file_path
     
 
-    def search_note(self, *phrases):
-        pass
+    def search_note(self, phrase, max_matches=10, *phrases):
+        # Iterate over all the files looking for matches:
+        #   add matched notes id's to matches
+        #       - Look at 
+        #   sort matches by match freq in a file
+        #   return matches list
+
+        notes = []
+        matches = []
+        for file in self.NOTES_DIR.iterdir():
+            with open(file, "r", encoding="utf-8") as note_file:
+                json_content = json.load(note_file)
+
+                notes.append({
+                    "id": json_content["id"], 
+                    "title": json_content["title"],
+                    "note": json_content["note"]
+                })
+
+        pattern = re.compile(rf"{phrase}", re.IGNORECASE)
+
+        matched_notes = [
+            note for note in notes 
+            if any(isinstance(v, str) and pattern.search(v) for v in note.values())
+        ]
+
+
+        return matched_notes, { "total_notes": len(notes), "matched_notes": len(matched_notes)}
     
         
             
