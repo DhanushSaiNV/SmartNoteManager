@@ -18,4 +18,4 @@ nm = NoteManager()
 # finally:
 #     print("Progam completed")
 
-print("TEST_OUT:", nm.search_note("note"))
+print("TEST_OUT:", nm.search_note("xx", "qq", "mango", "a"))

@@ -95,15 +95,13 @@ class NoteManager:
         return data, file_name, file_path
     
 
-    def search_note(self, phrase, max_matches=10, *phrases):
-        # Iterate over all the files looking for matches:
-        #   add matched notes id's to matches
-        #       - Look at 
-        #   sort matches by match freq in a file
-        #   return matches list
-
+    def search_note(self, *phrases, max_matches=10):
+        # Iterates over all note files, 
+        # loads and stores all json data in notes[]
+        # searches for pattern in note values iff: val is str & search found matches
+        # returns matched notes and stats
+        
         notes = []
-        matches = []
         for file in self.NOTES_DIR.iterdir():
             with open(file, "r", encoding="utf-8") as note_file:
                 json_content = json.load(note_file)
@@ -114,7 +112,7 @@ class NoteManager:
                     "note": json_content["note"]
                 })
 
-        pattern = re.compile(rf"{phrase}", re.IGNORECASE)
+        pattern = re.compile(rf"({"|".join(phrases)})", re.IGNORECASE)
 
         matched_notes = [
             note for note in notes 
