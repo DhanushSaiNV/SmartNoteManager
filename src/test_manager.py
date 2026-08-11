@@ -21,3 +21,12 @@ nm = NoteManager()
 
 # 44ee9004c84f42e09e52d7c0e447efcb
 print(nm.get_note("44ee9004c84f42e09e52d7c0e447efcb"))
+
+print("-" * 20)
+
+original = {'id': '44ee9004c84f42e09e52d7c0e447efcb', 'title': 'Silly first note!', 'tag': 'testing', 'note': 'This is a sample note\nEnjoy!', 'created_at': '2026-08-11T14:28:34.985357+00:00', 'modified_at': '2026-08-11T14:28:34.985357+00:00'}
+updated = {'id': '44ee9004c84f42e09e52d7c0e447efcb', 'title': 'Very Serious first note!', 'tag': 'testing', 'note': 'This is a sample note\nEnjoy!', 'created_at': '2026-08-11T14:28:34.985357+00:00', 'modified_at': '2026-08-11T14:28:34.985357+00:00'}
+
+nm.update_note("44ee9004c84f42e09e52d7c0e447efcb", updated)
+
+print(nm.get_note("44ee9004c84f42e09e52d7c0e447efcb"))

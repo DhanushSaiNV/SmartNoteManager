@@ -12,3 +12,9 @@ class NoteDeleteFailed(Exception):
 
 class NoteReadFailed(Exception):
     pass
+
+class NoteUpdateError(Exception):
+    pass
+
+class InvalidUpdateRequest(NoteUpdateError):
+    pass

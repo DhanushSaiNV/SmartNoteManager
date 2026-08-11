@@ -125,7 +125,43 @@ class NoteManager:
 
 
         return matched_notes, { "total_notes": len(notes), "matched_notes": len(matched_notes)}
+
     
+    def update_note(self, id, note_updated_data: dict = None):
+        # Get the required note:
+            # list all notes
+            # find req note
+        # write data into the note file (use appropriate file read mode)
+
+        if note_updated_data == None:
+            raise InvalidUpdateRequest("Update failed: No updated data provided") from NoteUpdateError
+
+        if note_updated_data.get("id", None) != str(id):
+            raise InvalidUpdateRequest("Update terminated: Detected unauthorized id change") from NoteUpdateError
+
+        if not note_updated_data.get('note', None) or len(note_updated_data.get("note", "")) <= 3 or len(note_updated_data.get('title', "")) <= 3:
+            raise InvalidUpdateRequest("Invalid note: Note & Title must be more than 3 characters length") from NoteUpdateError
+        
+        
+        note_file_ids = [str(file.stem) for file in self.NOTES_DIR.iterdir() if file.is_file()]
+
+        if not str(id) in note_file_ids:
+            raise NoteUpdateError("Update Failed: Note not found.") from FileNotFoundError
+        
+        note_file = Path(self.NOTES_DIR  / Path(str(id) + ".json"))
+
+        note_data = None
+        
+        try:
+            with open(note_file, "w", encoding="utf-8") as file:
+                note_updated_data["modified_at"] = utils.get_datetime()
+                json.dump(note_updated_data, file, indent=4)
+                
+        except Exception as e:
+            raise NoteUpdateError(f"Failed to update note: {e}") from e 
+
+        return note_data
+
 
     def delete_note(self, id: str):
         # list all the files in the NOTE_DIR folder
@@ -145,6 +181,7 @@ class NoteManager:
             return True
         else:
             raise NoteDeleteFailed("Delete Failed: Note not found.") from FileNotFoundError
+
 
     def get_note(self, id: str):
         # list all the files in the NOTE_DIR folder
