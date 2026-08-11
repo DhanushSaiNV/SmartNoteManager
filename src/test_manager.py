@@ -1,5 +1,5 @@
 from NoteManager import NoteManager
-from exceptions import FileSaveError
+from exceptions import FileSaveError, InvalidSearchInput
 
 nm = NoteManager()
 
@@ -18,4 +18,4 @@ nm = NoteManager()
 # finally:
 #     print("Progam completed")
 
-print("TEST_OUT:", nm.search_note("xx", "qq", "mango", "a"))
+print(nm.search_note(" "))

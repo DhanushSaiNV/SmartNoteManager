@@ -3,3 +3,6 @@ class FileSaveError(Exception):
 
 class TitleAlreadyUsedError(FileSaveError):
     pass
+
+class InvalidSearchInput(Exception):
+    pass

@@ -9,7 +9,7 @@ import re
 
 import cli
 import utils
-from exceptions import FileSaveError, TitleAlreadyUsedError
+from exceptions import FileSaveError, InvalidSearchInput
 
 """
 TODO: Implement note search
@@ -95,11 +95,15 @@ class NoteManager:
         return data, file_name, file_path
     
 
-    def search_note(self, *phrases, max_matches=10):
+    def search_note(self, *phrases, max_matches=10) -> tuple[list, dict]:
         # Iterates over all note files, 
         # loads and stores all json data in notes[]
         # searches for pattern in note values iff: val is str & search found matches
         # returns matched notes and stats
+
+        # raise excptn if phrases contains single empty str
+        if len(phrases) == 1 and phrases[0] == "" or phrases[0] == None:
+            raise InvalidSearchInput("Search Failed: Enter valid search input.") 
         
         notes = []
         for file in self.NOTES_DIR.iterdir():
