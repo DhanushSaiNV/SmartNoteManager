@@ -6,3 +6,6 @@ class TitleAlreadyUsedError(FileSaveError):
 
 class InvalidSearchInput(Exception):
     pass
+
+class NoteDeleteFailed(Exception):
+    pass

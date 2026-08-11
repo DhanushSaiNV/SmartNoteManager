@@ -9,7 +9,7 @@ import re
 
 import cli
 import utils
-from exceptions import FileSaveError, InvalidSearchInput
+from exceptions import FileSaveError, InvalidSearchInput, NoteDeleteFailed
 
 """
 TODO: Implement note search
@@ -126,8 +126,27 @@ class NoteManager:
 
         return matched_notes, { "total_notes": len(notes), "matched_notes": len(matched_notes)}
     
+
+    def delete_note(self, id: str):
+        # list all the files in the NOTE_DIR folder
+        # search for filename with same id (handle type issues)
+        # path.unlink() the file
+
+        note_file_ids = [str(file.stem) for file in self.NOTES_DIR.iterdir() if file.is_file()]
         
-            
+        if not str(id) in note_file_ids:
+            raise NoteDeleteFailed("Delete Failed: Note not found.") from FileNotFoundError
+        
+        note_file = Path(self.NOTES_DIR  / Path(str(id) + ".json"))
+
+        # delete the file
+        if note_file.exists() and note_file.is_file():
+            note_file.unlink()  
+            return True
+        else:
+            raise NoteDeleteFailed("Delete Failed: Note not found.") from FileNotFoundError
+
+
    
 if __name__ == "__main__":
     print(NoteManager.get_menu(), end=" ")
