@@ -1,5 +1,5 @@
 from pathlib import Path
-from platformdirs import user_data_dir
+from platformdirs import user_data_dir, user_downloads_path
 from datetime import datetime, timezone
 import json
 import uuid
@@ -20,9 +20,11 @@ class NoteManager:
         # create or get user DATA_DIR
         self.DATA_DIR = Path(user_data_dir("SmartNoteManager"))
         self.NOTES_DIR = self.DATA_DIR / "Notes"
+        self.TEMP_DIR = self.DATA_DIR / "Temp"
 
         self.DATA_DIR.mkdir(parents=True, exist_ok=True)
         self.NOTES_DIR.mkdir(parents=True, exist_ok=True)
+        self.TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
     OPTS, OPTS_L = cli.get_opts()
@@ -206,6 +208,64 @@ class NoteManager:
 
         return note_data
 
+
+    def _json_to_str(self, data):
+        title = data.get("title", "")
+        tag = data.get("tag","untagged")
+        note = data.get("note", "")
+
+        s = f"Title: {str(title).title()}\n"
+        s += f"Tag: {str(tag).upper()}\n\n"
+        s += f"Note: {str(note).capitalize()}\n\n"
+        s += f"{"-" * 10}\n\n"
+
+        return s
+
+    def export_data(self):
+        # Iterate through all data files
+        # append the data to the curr temp txt file
+
+        with tempfile.NamedTemporaryFile("a", dir=self.TEMP_DIR, delete=False) as temp_file:
+            temp_path = temp_file.name
+
+            try:
+                for note_file in self.NOTES_DIR.iterdir():
+                    if not note_file.is_file():
+                        print("Not a file") 
+                        return
+
+                    try:
+                        with open(note_file, "r", encoding="utf-8") as file:
+                            content = json.load(file)
+
+                            temp_file.write(self._json_to_str(content))
+
+                            temp_file.flush()
+                            os.fsync(temp_file.fileno())
+
+                    except Exception as e:
+                        temp_file.close()
+                        os.remove(temp_path)
+
+                        raise ExportingError(f"Exporting failed while reading note files: {e}") from e
+            except Exception as e: 
+                temp_file.close()
+                os.remove(temp_path)
+
+                raise ExportingError(f"Exporting failed: {e}") from e
+
+        downloads_path = user_downloads_path()
+
+        export_file_name = f"SmartNoteManager_{utils.get_datetime_readable()}.txt"
+        export_file_path = downloads_path / export_file_name
+
+        os.replace(temp_path, export_file_path)
+
+        return export_file_path
+
+        
+        
+                
 
    
 if __name__ == "__main__":

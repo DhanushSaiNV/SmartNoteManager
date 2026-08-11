@@ -18,3 +18,6 @@ class NoteUpdateError(Exception):
 
 class InvalidUpdateRequest(NoteUpdateError):
     pass
+
+class ExportingError(Exception):
+    pass
