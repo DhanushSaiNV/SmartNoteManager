@@ -9,3 +9,6 @@ class InvalidSearchInput(Exception):
 
 class NoteDeleteFailed(Exception):
     pass
+
+class NoteReadFailed(Exception):
+    pass
