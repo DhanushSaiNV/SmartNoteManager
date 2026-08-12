@@ -32,10 +32,12 @@ class NoteManager:
 
 
     @classmethod
-    def get_menu(cls):
+    def get_menu(cls, full=True):
         """
         Build & Return menu string, no new line character included at the end. 
         """
+        if not full:
+            return "\n\033[1mChoose an operation:\033[0m"
         
         menu = cls.menu + "\n"
 
@@ -93,7 +95,7 @@ class NoteManager:
 
         os.replace(temp_path, file_path)
 
-        return data, file_name, file_path
+        return file_name, file_path
     
 
     def search_note(self, *phrases, max_matches=10) -> tuple[list, dict]:
