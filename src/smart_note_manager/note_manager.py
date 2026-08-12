@@ -7,9 +7,8 @@ import tempfile
 import os
 import re
 
-import cli
-import utils
-from exceptions import *
+from . import cli, utils
+from .exceptions import *
 
 """
 TODO: Implement note search
