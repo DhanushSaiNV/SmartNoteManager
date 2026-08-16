@@ -105,8 +105,8 @@ class NoteManager:
         # returns matched notes and stats
 
         # raise excptn if phrases contains single empty str
-        if len(phrases) == 1 and phrases[0] == "" or phrases[0] == None:
-            raise InvalidSearchInput("Search Failed: Enter valid search input.") 
+        # if len(phrases) == 1 and phrases[0] == "" or phrases[0] == None:
+        #     raise InvalidSearchInput("Search Failed: Enter valid search input.") 
         
         notes = []
         for file in self.NOTES_DIR.iterdir():
@@ -116,7 +116,9 @@ class NoteManager:
                 notes.append({
                     "id": json_content["id"], 
                     "title": json_content["title"],
-                    "note": json_content["note"]
+                    "note": json_content["note"], 
+                    "created_at": json_content["created_at"],
+                    "modified_at": json_content["modified_at"]
                 })
 
         pattern = re.compile(rf"({"|".join(phrases)})", re.IGNORECASE)
@@ -126,6 +128,9 @@ class NoteManager:
             if any(isinstance(v, str) and pattern.search(v) for v in note.values())
         ]
 
+        # DEBUG: 
+        # with open("search_note_debug.txt", "a") as f:
+        #     f.write("\n" + str(phrases) + str(len(matched_notes)) + str(matched_notes))
 
         return matched_notes, { "total_notes": len(notes), "matched_notes": len(matched_notes)}
 

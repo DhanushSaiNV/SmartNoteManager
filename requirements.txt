@@ -1,1 +1,8 @@
+colorama==0.4.6
+iniconfig==2.3.0
+keyboard==0.13.5
+packaging==26.3
 platformdirs==4.11.1
+pluggy==1.6.0
+Pygments==2.20.0
+pytest==9.1.1
