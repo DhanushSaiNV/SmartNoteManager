@@ -55,7 +55,7 @@ def main():
 
             #Search Note
             case 2:
-                load()
+                load("LOADING")
 
                 cli.clear_screen()
 
@@ -73,18 +73,21 @@ def main():
                     "matched_notes": [],
                 }
 
+                curr_note = 1
+
                 while True:
                     # DEBUG:
                     # with open("debug.txt", "a") as f:
                     #     f.write("\n" + str(state))
+                    
 
                     cli.clear_screen()
-                    cli.render_notes(state.get("matched_notes"), state.get("phrase"), match_stats)
+                    cli.render_notes(state.get("matched_notes"), state.get("phrase"), match_stats, curr_note)
                     cli.save_cursor()
                         
 
                     cli.draw_bottom_search_box(prompt_label=f"Search: {state.get("phrase")}", help_text=help_text)
-                    
+
                     event = keyboard.read_event()
 
                     if event.event_type == keyboard.KEY_DOWN:
@@ -122,6 +125,20 @@ def main():
                                 first = True
                                 break
 
+                            case "up":
+                                if not curr_note == 1:
+                                    curr_note -= 1
+
+
+                            case "down":
+                                if (not curr_note == len(state["matched_notes"])) and (len(state["matched_notes"]) > 1):
+                                    curr_note += 1
+
+                            case "enter":
+                                cli.clear_screen()
+                                cli.restore_cursor()
+                                load("OPENING")
+                                first = True
                             case _:
                                 pass
 
@@ -136,9 +153,8 @@ def main():
                 raise ValueError("Invalid operation.")
 
 
-def load():
-    time.sleep(0.5)
-    print("Loading", end="", flush=True)
+def load(msg):
+    print(f"{msg}", end="", flush=True)
     for _ in range(3):
         time.sleep(0.5)
         print(".", end="", flush=True)
