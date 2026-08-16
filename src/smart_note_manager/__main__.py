@@ -5,10 +5,6 @@ from smart_note_manager import FileSaveError, InvalidUpdateRequest, NoteUpdateEr
 
 nm = NoteManager()
 
-# Disable terminal flow control (XON/XOFF) so Ctrl+S doesn't freeze the screen
-if sys.platform != "win32":
-    os.system("stty -ixon")
-
 def main():
     opt = None
     first = True

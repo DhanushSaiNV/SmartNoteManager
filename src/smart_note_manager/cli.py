@@ -95,7 +95,7 @@ def restore_cursor():
     sys.stdout.flush()
 
 
-def render_notes(notes_data, phrase, match_stats, curr=2):
+def render_notes2(notes_data, phrase, match_stats, curr=2):
     if not notes_data or len(notes_data) == 0:
         print(red("No results found."))
         return
@@ -119,11 +119,63 @@ def render_notes(notes_data, phrase, match_stats, curr=2):
 
         render_str = f"{STYLE}{brand_color(str(sl_no) + ".")}\t{STYLE}{brand_color(bold(note.get("title", "No title").title()))}{RESET}{RESET}\n"
         render_str += f"{indent}\t{make_dim(f"{utils.iso_to_readable(note.get("created_at"))}\n\n")}"
-        render_str += f"{indent}\t{make_dim(note.get("note", "No note")[:15])}..."
+        render_str += f"{indent}\t{make_dim(note.get("note", "No note")[:40])}..."
 
         print(render_str)
         print(make_dim("-" * 25))
         sl_no += 1
 
+def render_notes(notes_data, phrase, match_stats, curr=2):
+    if not notes_data or len(notes_data) == 0:
+        print(red("No results found."))
+        return
 
+    cols, _ = os.get_terminal_size()
+
+    # Debug:
+    # with open("debug.txt", "a") as f:
+    #     f.write(f"\n{phrase} : " + str(match_stats) + " >> " + str(notes_data))
+
+    sl_no = 1
+    RESET = "\033[0m"
+    REVERSE = "\033[7m"
+
+    for note in notes_data:
+        highlight = True if sl_no == curr else False
+
+        # Fixed indent: uses space ' ' instead of empty string ''
+        indent = ' ' * len(str(sl_no))
+
+        # Extract values once to keep string formatting clean
+        title = note.get("title", "No title").title()
+        date_str = utils.iso_to_readable(note.get("created_at"))
+        preview_str = note.get("note", "No note")[:round(cols/4)].replace("\n", " ") + "..."
+
+        if highlight:
+            # --- ACTIVE NOTE STYLING ---
+            pointer = " ► " 
+            
+            # Padded spaces inside the title so the REVERSE highlight looks like a neat badge
+            title_styled = f"{REVERSE}{brand_color(bold(f' {title} '))}{RESET}"
+            
+            # Bold the pointer and serial number
+            render_str = f"{brand_color(bold(pointer + str(sl_no) + '.'))}\t{title_styled}\n"
+            
+            # Un-dimmed date and preview so the active note is fully bright
+            render_str += f"{indent}   \t{date_str}\n\n"
+            render_str += f"{indent}   \t{preview_str}"
+        
+        else:
+            # --- INACTIVE NOTE STYLING ---
+            pointer = "   "
+            
+            render_str = f"{pointer}{brand_color(str(sl_no) + '.')}\t{brand_color(bold(title))}\n"
+            
+            # Dimmed text so inactive notes recede visually
+            render_str += f"{indent}   \t{make_dim(date_str)}\n\n"
+            render_str += f"{indent}   \t{make_dim(preview_str)}"
+
+        print(render_str)
+        print(make_dim("-" * round(cols/3))) # Slightly lengthened separator for better proportions
+        sl_no += 1
     
