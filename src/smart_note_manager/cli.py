@@ -92,7 +92,7 @@ def restore_cursor():
     sys.stdout.flush()
 
 
-def render_notes(notes_data, phrase, match_stats):
+def render_notes(notes_data, phrase, match_stats, curr=2):
     if not notes_data or len(notes_data) == 0:
         print(red("No results found."))
         return
@@ -104,12 +104,21 @@ def render_notes(notes_data, phrase, match_stats):
     sl_no = 1
     indent = '' * len(str(sl_no))
 
-    for note in notes_data:
-        print(f"{brand_color(str(sl_no))}.\t{brand_color(bold(note.get("title", "No title").title()))}")
-        print(f"{indent}\t{make_dim(f"{utils.iso_to_readable(note.get("created_at"))}")}")
-        print()
-        print(f"{indent}\t{make_dim(note.get("note", "No note")[:15])}...")
+    RESET = "\033[0m"
+    REVERSE = "\033[7m"
 
+    highlight = False
+
+    for note in notes_data:
+        highlight = True if sl_no == curr else False
+
+        STYLE = REVERSE if highlight else ""
+
+        render_str = f"{STYLE}{brand_color(str(sl_no) + ".")}\t{STYLE}{brand_color(bold(note.get("title", "No title").title()))}{RESET}{RESET}\n"
+        render_str += f"{indent}\t{make_dim(f"{utils.iso_to_readable(note.get("created_at"))}\n\n")}"
+        render_str += f"{indent}\t{make_dim(note.get("note", "No note")[:15])}..."
+
+        print(render_str)
         print(make_dim("-" * 25))
         sl_no += 1
 

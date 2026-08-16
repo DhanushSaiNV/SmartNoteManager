@@ -74,6 +74,10 @@ def main():
                 }
 
                 while True:
+                    # DEBUG:
+                    # with open("debug.txt", "a") as f:
+                    #     f.write("\n" + str(state))
+
                     cli.clear_screen()
                     cli.render_notes(state.get("matched_notes"), state.get("phrase"), match_stats)
                     cli.save_cursor()
@@ -93,9 +97,37 @@ def main():
                             state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
                             cli.restore_cursor()
 
-                        if event.name == "esc":
-                            cli.restore_cursor()
-                            break
+                        match(event.name):
+                            case "backspace":
+                                phrase = state["phrase"]
+                                state["phrase"] = phrase[:len(phrase) - 1]
+                                state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
+                                continue
+
+                            case "space":
+                                phrase = state["phrase"]
+                                state["phrase"] += " "
+                                state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
+                                continue
+
+                            case "tab":
+                                phrase = state["phrase"]
+                                state["phrase"] += "    "
+                                state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
+                                continue
+
+                            case "esc":
+                                cli.clear_screen()
+                                cli.restore_cursor()
+                                first = True
+                                break
+
+                            case _:
+                                pass
+
+                        
+                                
+
 
 
 
