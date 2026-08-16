@@ -6,6 +6,9 @@ OPTS = {
     i + 1: opt for i, opt in enumerate(OPTS_L)
 }
 
+RESET = "\033[0m"
+REVERSE = "\033[1;7m"
+
 def make_dim(txt):
     return f"\033[2m{txt}\033[0m"
 

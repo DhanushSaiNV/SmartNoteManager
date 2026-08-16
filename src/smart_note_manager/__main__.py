@@ -1,9 +1,13 @@
-import time, shutil, keyboard
+import time, shutil, keyboard, os, threading, sys
 
 from smart_note_manager import NoteManager, utils, cli
-from smart_note_manager import FileSaveError
+from smart_note_manager import FileSaveError, InvalidUpdateRequest, NoteUpdateError
 
 nm = NoteManager()
+
+# Disable terminal flow control (XON/XOFF) so Ctrl+S doesn't freeze the screen
+if sys.platform != "win32":
+    os.system("stty -ixon")
 
 def main():
     opt = None
@@ -23,6 +27,7 @@ def main():
 
         match(opt):
             case 1:
+                cli.clear_screen()
                 print("Opening new note...")
                 time.sleep(1)
                 cli.clear_screen() 
@@ -55,7 +60,7 @@ def main():
 
             #Search Note
             case 2:
-                load("LOADING")
+                load("Loading")
 
                 cli.clear_screen()
 
@@ -135,22 +140,130 @@ def main():
                                     curr_note += 1
 
                             case "enter":
+                                if not len(state["matched_notes"]) >= 1:
+                                    pass
+
                                 cli.clear_screen()
                                 cli.restore_cursor()
-                                load("OPENING")
-                                first = True
+                                load("Opening Note")
+
+                                # Open file, and when want to quit, use return_to_menu()
+                                open_note_file(state["matched_notes"][curr_note - 1]["id"])
                             case _:
                                 pass
 
-                        
-                                
-
-
-
-
-
             case _:
                 raise ValueError("Invalid operation.")
+
+def _handle_update_failure(e):
+        cli.clear_screen()
+        print(e)
+
+def save_note(id, note_data, note_lines):
+    cli.clear_screen()
+    load("Saving")
+
+    data = note_data
+    new_note = "\n".join(note_lines)
+    data["note"] = new_note
+
+    try:
+        nm.update_note(id, data)
+    except InvalidUpdateRequest as e: 
+        _handle_update_failure(e)
+        return False
+    except NoteUpdateError as e:
+        _handle_update_failure(e)
+        return False
+    except Exception as e:
+        _handle_update_failure(e)
+        return False
+
+    return True
+
+
+def open_note_file(id):
+    
+    note_data = nm.get_note(id)
+    title = note_data.get("title", "No Title")
+    tag = note_data.get("tag", "No Tag")
+    note = note_data.get("note", "No Note")
+    terminal_width = int(os.get_terminal_size().columns - 4)
+
+    note_lines = note.split("\n")
+
+    title_tag = (title.title() + " - " + tag.title())
+    centered_title = f"  {title_tag:<{int(terminal_width)}}"
+    right_aligned_shortcuts = cli.make_dim(f"  ALT + X to exit. ALT + S to save.")
+    header = f"\n{cli.REVERSE}{cli.brand_color(centered_title)}{cli.RESET}"
+    hint = f"{right_aligned_shortcuts:<{terminal_width}}"
+
+
+    while True:
+        cli.clear_screen()
+
+        print(header)
+        print(hint)
+
+        # make an editor    
+        for line_number, line in enumerate(note_lines, start=1):
+            print(cli.make_dim(f"\n{line_number}  "), end="", flush=True)
+            print(line, end="", flush=True)
+
+
+        event = keyboard.read_event()
+
+        # FIX 1: Ignore KEY_UP events to prevent double-typing characters
+        if event.event_type != keyboard.KEY_DOWN:
+            continue
+
+        # FIX 2: Ensure event.name is not None before processing
+        if not event.name:
+            continue
+
+        if keyboard.is_pressed("alt") or keyboard.is_pressed("left alt") or keyboard.is_pressed('right alt'):
+            if event.name == "s":
+                # time.sleep(0.2)
+
+                cli.clear_screen()
+
+                is_saved = save_note(id, note_data, note_lines)
+                if not is_saved:
+                    cli.red("Failed to save.")
+                    time.sleep(3)
+                break
+
+            elif event.name == "x":
+                break
+            continue
+
+        if keyboard.is_modifier(event.scan_code):
+            continue
+
+        if len(event.name) == 1:
+            char = event.name.upper() if keyboard.is_pressed("shift") else event.name
+            note_lines[-1] += char
+            continue
+
+        match(event.name):
+            case "enter":
+                note_lines.append("")
+            case "backspace":
+                # if first line and len of line is zero: reassign notelines to ['']
+                # elif not first line and len line is zero: pop last line
+                # else: i.e len line is non zero: remove last char from last line str
+                if len(note_lines) == 1 and len(note_lines[-1]) == 0:
+                    note_lines[-1] = ''
+                elif len(note_lines) >= 2 and len(note_lines[-1]) == 0:
+                    note_lines.pop()
+                else: 
+                    last_line = note_lines[-1]
+                    ll_len = len(last_line)
+                    last_line = last_line[:ll_len - 1]
+                    note_lines[-1] = last_line
+
+            case "space":
+                note_lines[-1] += " "
 
 
 def load(msg):
