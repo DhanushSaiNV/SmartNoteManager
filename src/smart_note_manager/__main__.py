@@ -81,6 +81,8 @@ def main():
                     # with open("debug.txt", "a") as f:
                     #     f.write("\n" + str(state))
                     
+                    if not curr_note <= len(state["matched_notes"]) or (len(state["matched_notes"]) and not curr_note >= 1 ) :
+                        curr_note = 1
 
                     cli.clear_screen()
                     cli.render_notes(state.get("matched_notes"), state.get("phrase"), match_stats, curr_note)
