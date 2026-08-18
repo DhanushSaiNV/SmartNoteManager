@@ -178,4 +178,15 @@ def render_notes(notes_data, phrase, match_stats, curr=2):
         print(render_str)
         print(make_dim("-" * round(cols/3))) # Slightly lengthened separator for better proportions
         sl_no += 1
-    
+
+def flush_input():
+    """Clears the terminal's input buffer across Windows, Mac, and Linux."""
+    try:
+        # Windows flush
+        import msvcrt
+        while msvcrt.kbhit():
+            msvcrt.getch()
+    except ImportError:
+        # Unix/Linux/Mac flush
+        import termios
+        termios.tcflush(sys.stdin, termios.TCIOFLUSH)

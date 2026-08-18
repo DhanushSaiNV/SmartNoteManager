@@ -188,7 +188,10 @@ def open_note_file(id):
 
     note_lines = note.split("\n")
 
-    title_tag = (title.title() + " - " + tag.title())
+    if not tag or len(tag) == 0:
+        tag = ""
+
+    title_tag = (title.title() + ((" - " + tag) if len(tag) else ""))
     centered_title = f"  {title_tag:<{int(terminal_width)}}"
     right_aligned_shortcuts = cli.make_dim(f"  ALT + X to exit. ALT + S to save.")
     header = f"\n{cli.REVERSE}{cli.brand_color(centered_title)}{cli.RESET}"
@@ -282,22 +285,74 @@ def return_to_menu():
 
     
 def process_create_req() -> tuple[str, str, str]:
-    print(cli.bold_underlined("\nNew Note"))
-    print(cli.make_dim("Start writing your note, Press ") + cli.bold("CTRL + C ") + cli.make_dim("when completed.\n"))
 
-    lines = []
+    note_lines = ['']
     title = ""
-    tag = "asdf"
+    tag = ""
 
-    line_no = 1
+    line = ""
 
     while True:
-        try:
-            lines.append(input(cli.make_dim(f"{line_no}  ")))
-            line_no += 1
-        except KeyboardInterrupt:
-            print("\n")
-            break
+            cli.clear_screen()
+    
+            print(cli.bold_underlined("New Note"))
+            print(cli.make_dim("Start writing your note, Press ") + cli.bold("CTRL + C ") + cli.make_dim("when completed."))
+    
+            # make an editor    
+            for line_number, line in enumerate(note_lines, start=1):
+                print(cli.make_dim(f"\n{line_number}  "), end="", flush=True)
+                print(line, end="", flush=True)
+    
+    
+            event = keyboard.read_event()
+    
+            if event.event_type != keyboard.KEY_DOWN:
+                continue
+    
+            if not event.name:
+                continue
+    
+            if keyboard.is_pressed("alt") or keyboard.is_pressed("left alt") or keyboard.is_pressed('right alt'):
+                if event.name == "s":
+                    # time.sleep(0.2)
+    
+                    # cli.clear_screen()
+                    print("\n")
+                    break
+    
+                elif event.name == "x":
+                    break
+                continue
+    
+            if keyboard.is_modifier(event.scan_code):
+                continue
+    
+            if len(event.name) == 1:
+                char = event.name.upper() if keyboard.is_pressed("shift") else event.name
+                note_lines[-1] += char
+                continue
+    
+            match(event.name):
+                case "enter":
+                    note_lines.append("")
+                case "backspace":
+                    # if first line and len of line is zero: reassign notelines to ['']
+                    # elif not first line and len line is zero: pop last line
+                    # else: i.e len line is non zero: remove last char from last line str
+                    if len(note_lines) == 1 and len(note_lines[-1]) == 0:
+                        note_lines[-1] = ''
+                    elif len(note_lines) >= 2 and len(note_lines[-1]) == 0:
+                        note_lines.pop()
+                    else: 
+                        last_line = note_lines[-1]
+                        ll_len = len(last_line)
+                        last_line = last_line[:ll_len - 1]
+                        note_lines[-1] = last_line
+    
+                case "space":
+                    note_lines[-1] += " "
+
+    cli.flush_input()
 
     while True:
         title = input(cli.bold(f"Enter Title{cli.red("*")}: ")).strip()
@@ -309,7 +364,7 @@ def process_create_req() -> tuple[str, str, str]:
         tag = input(cli.bold("Enter tag: ")).strip()
         break
 
-    note_str = "\n".join(lines)
+    note_str = "\n".join(note_lines)
 
     return title, tag, note_str
 
