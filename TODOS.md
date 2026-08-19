@@ -10,7 +10,7 @@
         
     - display only the notes that are in WINDOW.
 
- - IMPLEMENTATION:
+ - [DONE] IMPLEMENTATION:
      - On first iteration:
         - list all matched_notes and create Window.
      - when new "matched_notes" not equal to prev "matched_notes": 

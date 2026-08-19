@@ -174,7 +174,7 @@ def main():
                                 load("Opening Note")
 
                                 # Open file, and when want to quit, use return_to_menu()
-                                open_note_file(state["matched_notes"][curr_note - 1]["id"])
+                                open_note_file(window.curr_value["id"])
                             case _:
                                 pass
 

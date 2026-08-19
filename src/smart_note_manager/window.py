@@ -1,13 +1,15 @@
 import os, math
-from .cli import green, make_dim, brand_color, make_branding
+from .cli import green, make_dim, brand_color, make_branding, red
 
 class Window:
-    def __init__(self, low, search_box_height, note_height, list, LOG=False):
+    def __init__(self, low, search_box_height, note_height, list, LOG=False, size=None):
         self._search_box_height = search_box_height
         self._note_height = note_height
 
+        self._size = size
+
         self._low = low
-        self._high = self._low + self.size
+        self._high = self._low + self.size - 1
 
         self._list = list
 
@@ -38,7 +40,7 @@ class Window:
             elif i == self.curr_index:
                 items.append(green(text))
             elif is_in_window:
-                items.append(brand_color(text))
+                items.append(red(text))
             else:
                 items.append(make_dim(text))
 
@@ -69,6 +71,9 @@ class Window:
 
     @property
     def size(self):
+        if self._size != None: 
+            return self._size
+        
         _, lines = os.get_terminal_size()
 
         return math.floor((lines - self._search_box_height) / self._note_height)
@@ -120,7 +125,10 @@ class Window:
 
 
     def forward(self):
-        if self.window_is_at_end:
+        if self.curr == self._limit:
+            return self.values, self.curr
+        
+        if self.window_is_at_end and self.curr_at_end:
             return self.values, self.curr
 
         if self.curr_at_end:
@@ -136,7 +144,7 @@ class Window:
 
 
     def backward(self):
-        if self.window_is_at_beg:
+        if self.window_is_at_beg and self.curr_at_beg:
             return self.values, self.curr
 
         if self.curr_at_beg:
