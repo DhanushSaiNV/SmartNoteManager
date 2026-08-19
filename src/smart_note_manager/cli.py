@@ -1,5 +1,6 @@
 import os, sys, shutil
 from . import utils
+from .log import log
 
 OPTS_L = ["Create Note", "Search Note", "View Stats", "Export Data", "Remove Data", "Quit"]
 OPTS = {
@@ -125,7 +126,7 @@ def render_notes2(notes_data, phrase, match_stats, curr=2):
         print(make_dim("-" * 25))
         sl_no += 1
 
-def render_notes(notes_data, phrase, match_stats, curr=2):
+def render_notes(notes_data, sl_no_beg, curr=2):
     if not notes_data or len(notes_data) == 0:
         print(red("No results found."))
         return
@@ -136,10 +137,12 @@ def render_notes(notes_data, phrase, match_stats, curr=2):
     # with open("debug.txt", "a") as f:
     #     f.write(f"\n{phrase} : " + str(match_stats) + " >> " + str(notes_data))
 
-    sl_no = 1
+    sl_no = sl_no_beg
+
     RESET = "\033[0m"
     REVERSE = "\033[7m"
 
+    
     for note in notes_data:
         highlight = True if sl_no == curr else False
 

@@ -1,7 +1,11 @@
+DEBUG = False
+LOG = False
 import time, shutil, keyboard, os, threading, sys
 
 from smart_note_manager import NoteManager, utils, cli
 from smart_note_manager import FileSaveError, InvalidUpdateRequest, NoteUpdateError
+from .window import Window
+from .log import log
 
 nm = NoteManager()
 
@@ -76,16 +80,28 @@ def main():
 
                 curr_note = 1
 
+                first_iter = True
+                prev_notes = []
+                should_create_new_window = lambda prev, curr, first_iter: first_iter or prev != curr
+
+                search_box_height, note_height = 4, 5
+
                 while True:
                     # DEBUG:
                     # with open("debug.txt", "a") as f:
                     #     f.write("\n" + str(state))
                     
-                    if not curr_note <= len(state["matched_notes"]) or (len(state["matched_notes"]) and not curr_note >= 1 ) :
-                        curr_note = 1
+                    if should_create_new_window(prev_notes, state['matched_notes'], first_iter):
+                        window = Window(1, search_box_height, note_height, state["matched_notes"], LOG)
+                        first_iter = False
+
+                    # reset curr_note if: curr_note exceeds matched_notes OR curr_note is not set even matched_notes are existing.
+                    if not window.curr <= len(state["matched_notes"]) or (len(state["matched_notes"]) and not window.curr >= 1 ) :
+                        window = Window(1, search_box_height, note_height, state["matched_notes"], LOG)
+
 
                     cli.clear_screen()
-                    cli.render_notes(state.get("matched_notes"), state.get("phrase"), match_stats, curr_note)
+                    cli.render_notes(notes_data=window.values, sl_no_beg=window.low, curr=window.curr)
                     cli.save_cursor()
                         
 
@@ -101,6 +117,9 @@ def main():
 
                             state["matched_notes"] = []
                             state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
+
+                            prev_notes = state["matched_notes"]
+
                             cli.restore_cursor()
 
                         match(event.name):
@@ -108,18 +127,24 @@ def main():
                                 phrase = state["phrase"]
                                 state["phrase"] = phrase[:len(phrase) - 1]
                                 state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
+
+                                prev_notes = state["matched_notes"]
                                 continue
 
                             case "space":
                                 phrase = state["phrase"]
                                 state["phrase"] += " "
                                 state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
+
+                                prev_notes = state['matched_notes']
                                 continue
 
                             case "tab":
                                 phrase = state["phrase"]
                                 state["phrase"] += "    "
                                 state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
+
+                                prev_notes = state["matched_notes"]
                                 continue
 
                             case "esc":
@@ -129,13 +154,16 @@ def main():
                                 break
 
                             case "up":
-                                if not curr_note == 1:
-                                    curr_note -= 1
-
+                                window.backward()
+                                log(str(window.curr_at_beg))
+                                log()
 
                             case "down":
-                                if (not curr_note == len(state["matched_notes"])) and (len(state["matched_notes"]) > 1):
-                                    curr_note += 1
+                                # if (not curr_note == len(state["matched_notes"])) and (len(state["matched_notes"]) > 1):
+                                if len(state["matched_notes"]) > 1:
+                                    window.forward()
+                                    log(str(window.curr_at_end))
+                                    log()
 
                             case "enter":
                                 if not len(state["matched_notes"]) >= 1:
@@ -150,6 +178,7 @@ def main():
                             case _:
                                 pass
 
+                
             case _:
                 raise ValueError("Invalid operation.")
 

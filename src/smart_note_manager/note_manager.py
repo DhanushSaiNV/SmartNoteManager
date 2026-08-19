@@ -123,6 +123,11 @@ class NoteManager:
 
         pattern = re.compile(rf"({"|".join(phrases)})", re.IGNORECASE)
 
+
+        if len(phrases) == 0 or phrases[0] == "":
+            return notes, { "total_notes": len(notes), "matched_notes": len(notes)}
+
+    
         matched_notes = [
             note for note in notes 
             if any(isinstance(v, str) and pattern.search(v) for v in note.values())
