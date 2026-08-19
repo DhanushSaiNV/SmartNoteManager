@@ -1,11 +1,11 @@
-DEBUG = False
-LOG = False
 import time, shutil, keyboard, os, threading, sys
 
 from smart_note_manager import NoteManager, utils, cli
 from smart_note_manager import FileSaveError, InvalidUpdateRequest, NoteUpdateError
 from .window import Window
 from .log import log
+DEBUG = False
+LOG = False
 
 nm = NoteManager()
 
@@ -155,15 +155,11 @@ def main():
 
                             case "up":
                                 window.backward()
-                                log(str(window.curr_at_beg))
-                                log()
 
                             case "down":
                                 # if (not curr_note == len(state["matched_notes"])) and (len(state["matched_notes"]) > 1):
                                 if len(state["matched_notes"]) > 1:
                                     window.forward()
-                                    log(str(window.curr_at_end))
-                                    log()
 
                             case "enter":
                                 if not len(state["matched_notes"]) >= 1:

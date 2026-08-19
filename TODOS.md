@@ -19,4 +19,4 @@
         - if within window:
             - curr_note++
 
- - TEST: Window: what happens if the list size is less than window size
+ - [DONE] TEST: Window: what happens if the list size is less than window size
