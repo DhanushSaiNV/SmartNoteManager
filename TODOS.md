@@ -20,3 +20,13 @@
             - curr_note++
 
  - [DONE] TEST: Window: what happens if the list size is less than window size
+
+ - TODO: 
+     - Complete other funcs: stats, export, delete data, quit
+        1. Stats:
+            - Total Numeber of notes: len(notes)
+            - All the tags used: notes["tag] 
+            - Oldest Note: sort(key?)
+        
+        
+            

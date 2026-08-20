@@ -1,6 +1,8 @@
 import os, sys, shutil
 from . import utils
 from .log import log
+from .stats import Stats
+
 
 OPTS_L = ["Create Note", "Search Note", "View Stats", "Export Data", "Remove Data", "Quit"]
 OPTS = {
@@ -193,3 +195,22 @@ def flush_input():
         # Unix/Linux/Mac flush
         import termios
         termios.tcflush(sys.stdin, termios.TCIOFLUSH)
+
+
+def render_stats(stats: Stats):
+    clear_screen()
+
+    cols, lines = os.get_terminal_size()
+
+    bar_width = cols - 4
+
+    raw_title = "Notes Stats:"
+
+    centered_bar = make_branding(f"  {raw_title:<{bar_width}}")
+
+    print(f"{REVERSE}{centered_bar}{RESET}")
+    print()
+
+    print("  " + brand_color("Total Notes: ") + str(stats.total_notes))
+    print("  " + brand_color("Tags: ") + str(", ".join([tag for tag in stats.tags_used if tag != ""])).title())
+    print("  " + brand_color("Oldest Note: ") + str(stats.oldest_note["title"]).title())

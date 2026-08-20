@@ -1,11 +1,13 @@
 from pathlib import Path
 from platformdirs import user_data_dir, user_downloads_path
 from datetime import datetime, timezone
+from .stats import Stats
 import json
 import uuid
 import tempfile
 import os
 import re
+
 
 from . import cli, utils
 from .exceptions import *
@@ -96,8 +98,26 @@ class NoteManager:
         os.replace(temp_path, file_path)
 
         return file_name, file_path
-    
 
+
+    def _get_all_notes(self):
+        notes = []
+        for file in self.NOTES_DIR.iterdir():
+            with open(file, "r", encoding="utf-8") as note_file:
+                json_content = json.load(note_file)
+
+                notes.append({
+                    "id": json_content["id"], 
+                    "title": json_content["title"],
+                    "note": json_content["note"], 
+                    "tag": json_content["tag"] or "",
+                    "created_at": json_content["created_at"],
+                    "modified_at": json_content["modified_at"]
+                })
+
+        return notes
+
+        
     def search_note(self, *phrases, max_matches=10) -> tuple[list, dict]:
         # Iterates over all note files, 
         # loads and stores all json data in notes[]
@@ -108,18 +128,7 @@ class NoteManager:
         # if len(phrases) == 1 and phrases[0] == "" or phrases[0] == None:
         #     raise InvalidSearchInput("Search Failed: Enter valid search input.") 
         
-        notes = []
-        for file in self.NOTES_DIR.iterdir():
-            with open(file, "r", encoding="utf-8") as note_file:
-                json_content = json.load(note_file)
-
-                notes.append({
-                    "id": json_content["id"], 
-                    "title": json_content["title"],
-                    "note": json_content["note"], 
-                    "created_at": json_content["created_at"],
-                    "modified_at": json_content["modified_at"]
-                })
+        notes = self._get_all_notes()
 
         pattern = re.compile(rf"({"|".join(phrases)})", re.IGNORECASE)
 
@@ -274,11 +283,18 @@ class NoteManager:
 
         return export_file_path
 
-        
-        
-                
 
-   
+    def get_stats(self) -> Stats:
+        notes = self._get_all_notes()
+        stats = Stats()
+
+        stats.total_notes = len(notes)
+        stats.tags_used = [note.get("tag", "") for note in notes]
+        stats.oldest_note = min(notes, key=lambda note: note["created_at"])
+
+        return stats
+
+
 if __name__ == "__main__":
     print(NoteManager.get_menu(), end=" ")
     input()

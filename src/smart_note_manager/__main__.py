@@ -4,6 +4,8 @@ from smart_note_manager import NoteManager, utils, cli
 from smart_note_manager import FileSaveError, InvalidUpdateRequest, NoteUpdateError
 from .window import Window
 from .log import log
+from .stats import Stats
+
 DEBUG = False
 LOG = False
 
@@ -174,7 +176,10 @@ def main():
                             case _:
                                 pass
 
-                
+            case 3:
+                stats_data: Stats = nm.get_stats()
+                cli.render_stats(stats_data)
+
             case _:
                 raise ValueError("Invalid operation.")
 
