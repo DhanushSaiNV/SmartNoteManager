@@ -1,4 +1,4 @@
-from .window import Window
+from ..src.smart_note_manager.window import Window
 
 l = [1,2,3,4,5]
 
