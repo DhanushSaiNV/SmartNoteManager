@@ -259,8 +259,11 @@ def main():
                     load("Returning")
                     cli.clear_screen()
                     first = True
-        
-                
+
+            case 6: 
+                print()
+                load("Quitting")
+                exit()
             case _:
                 raise ValueError("Invalid operation.")
 

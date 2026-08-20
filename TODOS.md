@@ -54,4 +54,6 @@
                 - cli.red(Failed to remove data: e)
             - load(Returning)
 
-            
+        5. Quit:
+            - load(Quitting)
+            - exit()
