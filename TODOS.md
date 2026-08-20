@@ -27,6 +27,13 @@
             - Total Numeber of notes: len(notes)
             - All the tags used: notes["tag] 
             - Oldest Note: sort(key?)
+        2. [DONE] export: 
+            - if user selects Export Data
+            - load("Exporting")
+            - call nm.export_data()
+            - print success message: Exported into txt file at path cli.green(***.txt)
+            - ALT + X to return to menu
+            - returns to menu
         
 
             

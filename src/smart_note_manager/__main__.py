@@ -1,7 +1,7 @@
 import time, shutil, keyboard, os, threading, sys
 
 from smart_note_manager import NoteManager, utils, cli
-from smart_note_manager import FileSaveError, InvalidUpdateRequest, NoteUpdateError
+from smart_note_manager import FileSaveError, InvalidUpdateRequest, NoteUpdateError, ExportingError
 from .window import Window
 from .log import log
 from .stats import Stats
@@ -197,6 +197,50 @@ def main():
                 load("Returning")
                 cli.clear_screen()
                 first = True
+
+            case 4:
+                cli.clear_screen()
+                load("Exporting")
+                print()
+
+                try:
+                    export_path = nm.export_data()
+
+                except (ExportingError, Exception) as e:
+                    print(cli.red(e))
+                    load("Returning")
+                    cli.clear_screen()
+                    first = True
+                    continue
+
+                print(f"Exported data into txt file at {cli.green(export_path)}")
+
+                cols, lines = os.get_terminal_size()
+
+                lines -= 4
+
+                while lines >= 3:
+                    print()
+                    lines -= 1
+
+                print(cli.make_dim("[ ") + cli.red("ALT + X") + cli.make_dim(" to return to menu.") + cli.make_dim(" ]"),flush=True, end=" ")
+
+                while True:
+                    event = keyboard.read_event()
+
+                    if event.event_type != keyboard.KEY_DOWN:
+                        continue
+                
+                    if keyboard.is_pressed("alt") or keyboard.is_pressed("left alt") or keyboard.is_pressed("right alt"):
+                        if event.name == "x" or event.name == "X": 
+                            break                
+
+                cli.clear_screen()
+                cli.flush_input()
+                load("Returning")
+                cli.clear_screen()
+                first = True
+
 
             case _:
                 raise ValueError("Invalid operation.")
