@@ -288,8 +288,9 @@ class NoteManager:
         notes = self._get_all_notes()
         stats = Stats()
 
+
         stats.total_notes = len(notes)
-        stats.tags_used = [note.get("tag", "") for note in notes]
+        stats.tags_used = list({note.get("tag", "") for note in notes})
         stats.oldest_note = min(notes, key=lambda note: note["created_at"])
 
         return stats

@@ -214,3 +214,8 @@ def render_stats(stats: Stats):
     print("  " + brand_color("Total Notes: ") + str(stats.total_notes))
     print("  " + brand_color("Tags: ") + str(", ".join([tag for tag in stats.tags_used if tag != ""])).title())
     print("  " + brand_color("Oldest Note: ") + str(stats.oldest_note["title"]).title())
+
+    line = lines - 5
+    while line >= 3:
+        print()
+        line -= 1

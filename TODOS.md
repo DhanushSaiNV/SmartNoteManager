@@ -23,10 +23,10 @@
 
  - TODO: 
      - Complete other funcs: stats, export, delete data, quit
-        1. Stats:
+        1. [DONE] Stats:
             - Total Numeber of notes: len(notes)
             - All the tags used: notes["tag] 
             - Oldest Note: sort(key?)
         
-        
+
             

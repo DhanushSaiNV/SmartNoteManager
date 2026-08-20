@@ -180,6 +180,24 @@ def main():
                 stats_data: Stats = nm.get_stats()
                 cli.render_stats(stats_data)
 
+                print(cli.make_dim("[ ") + cli.red("ALT + X") + cli.make_dim(" to return to menu.") + cli.make_dim(" ]"),flush=True, end=" ")
+
+                while True:
+                    event = keyboard.read_event()
+
+                    if event.event_type != keyboard.KEY_DOWN:
+                        continue
+                
+                    if keyboard.is_pressed("alt") or keyboard.is_pressed("left alt") or keyboard.is_pressed("right alt"):
+                        if event.name == "x" or event.name == "X": 
+                            break
+
+                cli.clear_screen()
+                cli.flush_input()
+                load("Returning")
+                cli.clear_screen()
+                first = True
+
             case _:
                 raise ValueError("Invalid operation.")
 
