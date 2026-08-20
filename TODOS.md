@@ -35,5 +35,23 @@
             - ALT + X to return to menu
             - returns to menu
         
+        3. [DONE] Delete Backend:
+            - Create a backup folder in TEMP_DIR as BACKUP_DIR: with timestamp included in folder name
+                - copy notes from NOTES_DIR to BACKUP_DIR
+            - Delete notes in NOTES_DIR
+                - if deletion successful
+                    - delte BACKUP_DIR
+                    - continue
+                - else: copy BACKUP_DIR -> NOTES_DIR
+            - return number of notes deleted.
+
+        4. [DONE] Delete Frontend:
+            - clearscr, load(Deleting)
+            - nm.remove_data with exception handling
+            - if success:
+                - <count> note files deleted.
+            - else:
+                - cli.red(Failed to remove data: e)
+            - load(Returning)
 
             

@@ -15,7 +15,4 @@ import re
 
 nm = NoteManager()
 
-print(nm.search_note("a")[0])
-print(nm.search_note("af")[0])
-print(nm.search_note("afy")[0])
-print(nm.search_note("afyu")[0])
+print(nm.remove_data())

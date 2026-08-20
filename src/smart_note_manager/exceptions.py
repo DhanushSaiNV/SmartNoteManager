@@ -21,3 +21,6 @@ class InvalidUpdateRequest(NoteUpdateError):
 
 class ExportingError(Exception):
     pass
+
+class DataRemoveError(Exception):
+    pass

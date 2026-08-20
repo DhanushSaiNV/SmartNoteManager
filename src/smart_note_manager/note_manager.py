@@ -3,6 +3,7 @@ from platformdirs import user_data_dir, user_downloads_path
 from datetime import datetime, timezone
 from .stats import Stats
 import json
+import shutil
 import uuid
 import tempfile
 import os
@@ -22,10 +23,12 @@ class NoteManager:
         self.DATA_DIR = Path(user_data_dir("SmartNoteManager"))
         self.NOTES_DIR = self.DATA_DIR / "Notes"
         self.TEMP_DIR = self.DATA_DIR / "Temp"
+        self.BACKUPS_DIR = self.TEMP_DIR / "Backups"
 
         self.DATA_DIR.mkdir(parents=True, exist_ok=True)
         self.NOTES_DIR.mkdir(parents=True, exist_ok=True)
         self.TEMP_DIR.mkdir(parents=True, exist_ok=True)
+        self.BACKUPS_DIR.mkdir(parents=True, exist_ok=True)
 
 
     OPTS, OPTS_L = cli.get_opts()
@@ -282,6 +285,51 @@ class NoteManager:
         os.replace(temp_path, export_file_path)
 
         return export_file_path
+
+
+    def remove_data(self) -> int:
+        note_count = 0
+        try:
+            # store all notes in a temp folder
+            BACKUP_DIR = self.BACKUPS_DIR / utils.get_datetime_for_folder_name()
+
+            BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+
+            shutil.copytree(self.NOTES_DIR, BACKUP_DIR, dirs_exist_ok=True)
+
+            # delete notes in NOTES_DIR
+            for file in self.NOTES_DIR.iterdir():
+                if file.is_file:
+                    file.unlink()
+                    note_count += 1
+
+        except Exception as e:
+            # deletion fails
+
+            # remove remaining note files in NOTES_DIR
+            for file in self.NOTES_DIR.iterdir():
+                if file.is_file:
+                    file.unlink()
+
+            # copy notes from backupdir to NOTES_DIR
+            shutil.copytree(BACKUP_DIR, self.NOTES_DIR, dirs_exist_ok=True)
+
+            raise DataRemoveError(f"Data Removal Failed: {e}") from e
+
+        else:
+            # deletion successful
+            # remove temp folder
+            try:
+                shutil.rmtree(BACKUP_DIR)        
+                return note_count
+            
+            except FileNotFoundError:
+                print("The folder does not exist.")
+            except PermissionError:
+                print("Permission denied to delete this folder.")
+            except Exception as e:
+                raise DataRemoveError(f"Data Removal Failed while deleting backup folder: {e}") from e
+
 
 
     def get_stats(self) -> Stats:

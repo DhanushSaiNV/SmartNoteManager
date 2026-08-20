@@ -1,7 +1,7 @@
 import time, shutil, keyboard, os, threading, sys
 
 from smart_note_manager import NoteManager, utils, cli
-from smart_note_manager import FileSaveError, InvalidUpdateRequest, NoteUpdateError, ExportingError
+from smart_note_manager import *
 from .window import Window
 from .log import log
 from .stats import Stats
@@ -241,7 +241,26 @@ def main():
                 cli.clear_screen()
                 first = True
 
+            case 5:
+                cli.clear_screen()
+                load("Removing Data")
 
+                deleted_count = 0
+
+                try:
+                    deleted_count = nm.remove_data()
+                except (DataRemoveError, Exception) as e:
+                    cli.red(f"Data Removal Failed: {e}")
+                else:
+                    # removal successful
+                    print(cli.green(f"{deleted_count}") + " note files deleted.")
+                    time.sleep(3)
+                finally:
+                    load("Returning")
+                    cli.clear_screen()
+                    first = True
+        
+                
             case _:
                 raise ValueError("Invalid operation.")
 
