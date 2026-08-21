@@ -54,9 +54,19 @@ class NoteManager:
 
 
     @classmethod
-    def validate_opt_input(cls, input: int):
-        if not input or input not in range(1, len(cls.OPTS_L) + 1):
+    def validate_opt_input(cls, input: int) -> int:
+        inp = None
+
+        try:
+            inp = int(input)
+        except ValueError as e:
+            raise ValueError("Invalid input: Enter a valid number")
+        
+        if not inp or inp not in range(1, len(cls.OPTS_L) + 1):
             raise ValueError("Invalid input: Enter valid operation number [1/2/.../6]")
+
+        # Return the validated input: if nothing wrong with it.
+        return inp
 
 
     def create_note(self, note_data: str = None, tag: str = None, title: str = None):

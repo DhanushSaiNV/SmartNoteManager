@@ -17,12 +17,12 @@ def main():
 
     while opt != "6":
         print(nm.get_menu(full=first), end=" ")
-        opt = int(input())
+        opt = input()
 
         first = False
 
         try:
-            nm.validate_opt_input(opt)
+            opt = nm.validate_opt_input(opt)
         except ValueError as e:
             print(cli.red(e)) 
             continue
