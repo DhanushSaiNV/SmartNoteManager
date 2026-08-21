@@ -432,14 +432,24 @@ def process_create_req() -> tuple[str, str, str, str]:
 
     line = ""
 
+    show_invalid_note_error_hint = False
+
     while True:
             cli.clear_screen()
     
             print(cli.bold_underlined("New Note"))
             save_hint = cli.make_dim("[ ") + cli.green("ALT + S ") + cli.make_dim("to save.") + cli.make_dim(" ]")
             quit_hint = cli.make_dim("[ ") + cli.red("ALT + X") + cli.make_dim(" to quit. ]")
-            print(save_hint + quit_hint)
-    
+            
+            if show_invalid_note_error_hint:
+                print(cli.red("Note length must more than 3 characters."))
+            else: 
+                print(save_hint + quit_hint)
+
+
+            if len(note_lines) == 1 and len(line) >= 3:
+                show_invalid_note_error_hint = False
+
             # make an editor    
             for line_number, line in enumerate(note_lines, start=1):
                 print(cli.make_dim(f"\n{line_number}  "), end="", flush=True)
@@ -458,6 +468,9 @@ def process_create_req() -> tuple[str, str, str, str]:
                 if event.name == "s":
                     # time.sleep(0.2)
 
+                    if len(note_lines) == 1 and len(line) <= 3:
+                        show_invalid_note_error_hint = True
+                        continue
 
                     print("\n")
                     load("Saving")
