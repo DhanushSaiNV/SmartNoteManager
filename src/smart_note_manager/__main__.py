@@ -7,7 +7,7 @@ from .log import log
 from .stats import Stats
 
 DEBUG = False
-LOG = True
+LOG = False
 
 nm = NoteManager()
 
@@ -85,13 +85,15 @@ def main():
                         
                     cli.save_cursor()
 
+                    all_notes, _ = nm.search_note("")
+
                     state = {
                         "phrase": "", 
-                        "matched_notes": [],
+                        "matched_notes": list(all_notes),
                     }
 
                     first_iter = True
-                    prev_notes = []
+                    prev_notes = state["matched_notes"]
                     should_create_new_window = lambda prev, curr, first_iter: first_iter or prev != curr
 
                     search_box_height, note_height = 4, 5
@@ -106,15 +108,19 @@ def main():
                         
                         if should_create_new_window(prev_notes, state['matched_notes'], first_iter):
                             window = Window(1, search_box_height, note_height, state["matched_notes"], LOG)
+
                             if LOG:
                                 with open("debug3.txt", "w") as f:
                                     f.write("New window is created.\n")
                                     f.write(str(window))
+
+                            prev_notes = state["matched_notes"]
+
                             first_iter = False
                         else:
                             if LOG:
                                 with open("debug3.txt", "w") as f:
-                                    f.write("")
+                                    f.write(f"Current Window: {window.id}")
 
                         # reset curr_note if: curr_note exceeds matched_notes OR curr_note is not set even matched_notes are existing.
                         if not window.curr <= len(state["matched_notes"]) or (len(state["matched_notes"]) and not window.curr >= 1 ) :
@@ -126,10 +132,18 @@ def main():
                                 log_str += f"\ncurr_matched_notes: {str([v["id"][:3] for v in state['matched_notes']])}"
 
                             window = Window(1, search_box_height, note_height, state["matched_notes"], LOG)
+                            if LOG:
+                                with open("debug3.txt", "w") as f:
+                                    f.write("New window is created. [change in len of matched notes]\n")
+                                    f.write(str(window))
 
 
                         cli.clear_screen()
+
+                        
                         cli.render_notes(notes_data=window.values, sl_no_beg=window.low, curr=window.curr)
+                        
+
                         cli.save_cursor()
 
                         if LOG:

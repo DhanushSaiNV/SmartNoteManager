@@ -1,4 +1,4 @@
-import os, math
+import os, math, uuid
 from .cli import green, make_dim, brand_color, make_branding, red
 
 class Window:
@@ -19,6 +19,7 @@ class Window:
         self._curr = 1 if len(self._list) else -1
         self._sl_no = self._curr
 
+        self._uuid = uuid.uuid4().hex
         self.LOG = LOG
 
 
@@ -47,7 +48,12 @@ class Window:
         items_str = ", ".join(items)
         window_str = ", ".join(window)
 
-        return f"Curr: {self.curr} | [{items_str}]\nWindow: {window_str}"
+        return f"ID: {self._uuid} | Curr: {self.curr} | [{items_str}]\nWindow: {window_str}"
+
+
+    @property
+    def id(self):
+        return self._uuid
 
 
     @property
