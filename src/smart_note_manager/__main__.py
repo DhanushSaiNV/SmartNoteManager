@@ -15,257 +15,263 @@ def main():
     opt = None
     first = True
 
-    while opt != "6":
-        print(nm.get_menu(full=first), end=" ")
-        opt = input()
+    try:
+        while opt != "6":
+            print(nm.get_menu(full=first), end=" ")
+            opt = input()
 
-        first = False
+            first = False
 
-        try:
-            opt = nm.validate_opt_input(opt)
-        except ValueError as e:
-            print(cli.red(e)) 
-            continue
+            try:
+                opt = nm.validate_opt_input(opt)
+            except ValueError as e:
+                print(cli.red(e)) 
+                continue
 
-        match(opt):
-            case 1:
-                cli.clear_screen()
-                print("Opening new note...")
-                time.sleep(1)
-                cli.clear_screen() 
+            match(opt):
+                case 1:
+                    cli.clear_screen()
+                    print("Opening new note...")
+                    time.sleep(1)
+                    cli.clear_screen() 
 
-                title, tag, note = process_create_req()
-                
-                try:
-                    note_file_name, note_file_path = nm.create_note(note, tag, title)
-                except ValueError as e:
-                    print(cli.red(e))
-
-                    return_to_menu()
-
-                    first = True
-                    continue
-
-                except FileSaveError as e:
-                    print(cli.red(e))
-
-                    return_to_menu()
-
-                    first = True
-                    continue
-                else:
-                    print(cli.green("Note saved."))
-                    return_to_menu()
-
-                    first = True
-                    continue
-
-            #Search Note
-            case 2:
-                load("Loading")
-
-                cli.clear_screen()
-
-                search_phrases = []
-                phrase = ""
-
-                help_text = cli.make_dim(f"[Search phrases in title or content — separate with commas.]" + f" {cli.bold("Press Esc when finished.")}")
-                prompt_text = cli.brand_color("Search: ")
+                    title, tag, note = process_create_req()
                     
-                cli.save_cursor()
-                matched_notes, match_stats = None, None
+                    try:
+                        note_file_name, note_file_path = nm.create_note(note, tag, title)
+                    except ValueError as e:
+                        print(cli.red(e))
 
-                state = {
-                    "phrase": "", 
-                    "matched_notes": [],
-                }
+                        return_to_menu()
 
-                curr_note = 1
+                        first = True
+                        continue
 
-                first_iter = True
-                prev_notes = []
-                should_create_new_window = lambda prev, curr, first_iter: first_iter or prev != curr
+                    except FileSaveError as e:
+                        print(cli.red(e))
 
-                search_box_height, note_height = 4, 5
+                        return_to_menu()
 
-                while True:
-                    # DEBUG:
-                    # with open("debug.txt", "a") as f:
-                    #     f.write("\n" + str(state))
-                    
-                    if should_create_new_window(prev_notes, state['matched_notes'], first_iter):
-                        window = Window(1, search_box_height, note_height, state["matched_notes"], LOG)
-                        first_iter = False
+                        first = True
+                        continue
+                    else:
+                        print(cli.green("Note saved."))
+                        return_to_menu()
 
-                    # reset curr_note if: curr_note exceeds matched_notes OR curr_note is not set even matched_notes are existing.
-                    if not window.curr <= len(state["matched_notes"]) or (len(state["matched_notes"]) and not window.curr >= 1 ) :
-                        window = Window(1, search_box_height, note_height, state["matched_notes"], LOG)
+                        first = True
+                        continue
 
+                #Search Note
+                case 2:
+                    load("Loading")
 
                     cli.clear_screen()
-                    cli.render_notes(notes_data=window.values, sl_no_beg=window.low, curr=window.curr)
-                    cli.save_cursor()
+
+                    search_phrases = []
+                    phrase = ""
+
+                    help_text = cli.make_dim(f"[Search phrases in title or content — separate with commas.]" + f" {cli.bold("Press Esc when finished.")}")
+                    prompt_text = cli.brand_color("Search: ")
                         
+                    cli.save_cursor()
+                    matched_notes, match_stats = None, None
 
-                    cli.draw_bottom_search_box(prompt_label=f"Search: {state.get("phrase")}", help_text=help_text)
+                    state = {
+                        "phrase": "", 
+                        "matched_notes": [],
+                    }
 
-                    event = keyboard.read_event()
+                    curr_note = 1
 
-                    if event.event_type == keyboard.KEY_DOWN:
-                        # TODO: Needs refinement: on finding weather the key is a char or sys key like alt,ctrl...
-                        if len(event.name) == 1:
-                            print(event.name, end="", flush=True)
-                            state["phrase"] += str(event.name).strip()
+                    first_iter = True
+                    prev_notes = []
+                    should_create_new_window = lambda prev, curr, first_iter: first_iter or prev != curr
 
-                            state["matched_notes"] = []
-                            state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
+                    search_box_height, note_height = 4, 5
 
-                            prev_notes = state["matched_notes"]
+                    while True:
+                        # DEBUG:
+                        # with open("debug.txt", "a") as f:
+                        #     f.write("\n" + str(state))
+                        
+                        if should_create_new_window(prev_notes, state['matched_notes'], first_iter):
+                            window = Window(1, search_box_height, note_height, state["matched_notes"], LOG)
+                            first_iter = False
 
-                            cli.restore_cursor()
+                        # reset curr_note if: curr_note exceeds matched_notes OR curr_note is not set even matched_notes are existing.
+                        if not window.curr <= len(state["matched_notes"]) or (len(state["matched_notes"]) and not window.curr >= 1 ) :
+                            window = Window(1, search_box_height, note_height, state["matched_notes"], LOG)
 
-                        match(event.name):
-                            case "backspace":
-                                phrase = state["phrase"]
-                                state["phrase"] = phrase[:len(phrase) - 1]
+
+                        cli.clear_screen()
+                        cli.render_notes(notes_data=window.values, sl_no_beg=window.low, curr=window.curr)
+                        cli.save_cursor()
+                            
+
+                        cli.draw_bottom_search_box(prompt_label=f"Search: {state.get("phrase")}", help_text=help_text)
+
+                        event = keyboard.read_event()
+
+                        if event.event_type == keyboard.KEY_DOWN:
+                            # TODO: Needs refinement: on finding weather the key is a char or sys key like alt,ctrl...
+                            if len(event.name) == 1:
+                                print(event.name, end="", flush=True)
+                                state["phrase"] += str(event.name).strip()
+
+                                state["matched_notes"] = []
                                 state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
 
                                 prev_notes = state["matched_notes"]
-                                continue
 
-                            case "space":
-                                phrase = state["phrase"]
-                                state["phrase"] += " "
-                                state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
-
-                                prev_notes = state['matched_notes']
-                                continue
-
-                            case "tab":
-                                phrase = state["phrase"]
-                                state["phrase"] += "    "
-                                state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
-
-                                prev_notes = state["matched_notes"]
-                                continue
-
-                            case "esc":
-                                cli.clear_screen()
                                 cli.restore_cursor()
-                                first = True
-                                break
 
-                            case "up":
-                                window.backward()
+                            match(event.name):
+                                case "backspace":
+                                    phrase = state["phrase"]
+                                    state["phrase"] = phrase[:len(phrase) - 1]
+                                    state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
 
-                            case "down":
-                                # if (not curr_note == len(state["matched_notes"])) and (len(state["matched_notes"]) > 1):
-                                if len(state["matched_notes"]) > 1:
-                                    window.forward()
+                                    prev_notes = state["matched_notes"]
+                                    continue
 
-                            case "enter":
-                                if not len(state["matched_notes"]) >= 1:
+                                case "space":
+                                    phrase = state["phrase"]
+                                    state["phrase"] += " "
+                                    state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
+
+                                    prev_notes = state['matched_notes']
+                                    continue
+
+                                case "tab":
+                                    phrase = state["phrase"]
+                                    state["phrase"] += "    "
+                                    state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
+
+                                    prev_notes = state["matched_notes"]
+                                    continue
+
+                                case "esc":
+                                    cli.clear_screen()
+                                    cli.restore_cursor()
+                                    first = True
+                                    break
+
+                                case "up":
+                                    window.backward()
+
+                                case "down":
+                                    # if (not curr_note == len(state["matched_notes"])) and (len(state["matched_notes"]) > 1):
+                                    if len(state["matched_notes"]) > 1:
+                                        window.forward()
+
+                                case "enter":
+                                    if not len(state["matched_notes"]) >= 1:
+                                        pass
+
+                                    cli.clear_screen()
+                                    cli.restore_cursor()
+                                    load("Opening Note")
+
+                                    # Open file, and when want to quit, use return_to_menu()
+                                    open_note_file(window.curr_value["id"])
+                                case _:
                                     pass
 
-                                cli.clear_screen()
-                                cli.restore_cursor()
-                                load("Opening Note")
+                case 3:
+                    stats_data: Stats = nm.get_stats()
+                    cli.render_stats(stats_data)
 
-                                # Open file, and when want to quit, use return_to_menu()
-                                open_note_file(window.curr_value["id"])
-                            case _:
-                                pass
+                    print(cli.make_dim("[ ") + cli.red("ALT + X") + cli.make_dim(" to return to menu.") + cli.make_dim(" ]"),flush=True, end=" ")
 
-            case 3:
-                stats_data: Stats = nm.get_stats()
-                cli.render_stats(stats_data)
+                    while True:
+                        event = keyboard.read_event()
 
-                print(cli.make_dim("[ ") + cli.red("ALT + X") + cli.make_dim(" to return to menu.") + cli.make_dim(" ]"),flush=True, end=" ")
+                        if event.event_type != keyboard.KEY_DOWN:
+                            continue
+                    
+                        if keyboard.is_pressed("alt") or keyboard.is_pressed("left alt") or keyboard.is_pressed("right alt"):
+                            if event.name == "x" or event.name == "X": 
+                                break
 
-                while True:
-                    event = keyboard.read_event()
-
-                    if event.event_type != keyboard.KEY_DOWN:
-                        continue
-                
-                    if keyboard.is_pressed("alt") or keyboard.is_pressed("left alt") or keyboard.is_pressed("right alt"):
-                        if event.name == "x" or event.name == "X": 
-                            break
-
-                cli.clear_screen()
-                cli.flush_input()
-                load("Returning")
-                cli.clear_screen()
-                first = True
-
-            case 4:
-                cli.clear_screen()
-                load("Exporting")
-                print()
-
-                try:
-                    export_path = nm.export_data()
-
-                except (ExportingError, Exception) as e:
-                    print(cli.red(e))
+                    cli.clear_screen()
+                    cli.flush_input()
                     load("Returning")
                     cli.clear_screen()
                     first = True
-                    continue
 
-                print(f"Exported data into txt file at {cli.green(export_path)}")
-
-                cols, lines = os.get_terminal_size()
-
-                lines -= 4
-
-                while lines >= 3:
+                case 4:
+                    cli.clear_screen()
+                    load("Exporting")
                     print()
-                    lines -= 1
 
-                print(cli.make_dim("[ ") + cli.red("ALT + X") + cli.make_dim(" to return to menu.") + cli.make_dim(" ]"),flush=True, end=" ")
+                    try:
+                        export_path = nm.export_data()
 
-                while True:
-                    event = keyboard.read_event()
-
-                    if event.event_type != keyboard.KEY_DOWN:
+                    except (ExportingError, Exception) as e:
+                        print(cli.red(e))
+                        load("Returning")
+                        cli.clear_screen()
+                        first = True
                         continue
-                
-                    if keyboard.is_pressed("alt") or keyboard.is_pressed("left alt") or keyboard.is_pressed("right alt"):
-                        if event.name == "x" or event.name == "X": 
-                            break                
 
-                cli.clear_screen()
-                cli.flush_input()
-                load("Returning")
-                cli.clear_screen()
-                first = True
+                    print(f"Exported data into txt file at {cli.green(export_path)}")
 
-            case 5:
-                cli.clear_screen()
-                load("Removing Data")
+                    cols, lines = os.get_terminal_size()
 
-                deleted_count = 0
+                    lines -= 4
 
-                try:
-                    deleted_count = nm.remove_data()
-                except (DataRemoveError, Exception) as e:
-                    cli.red(f"Data Removal Failed: {e}")
-                else:
-                    # removal successful
-                    print(cli.green(f"{deleted_count}") + " note files deleted.")
-                    time.sleep(3)
-                finally:
+                    while lines >= 3:
+                        print()
+                        lines -= 1
+
+                    print(cli.make_dim("[ ") + cli.red("ALT + X") + cli.make_dim(" to return to menu.") + cli.make_dim(" ]"),flush=True, end=" ")
+
+                    while True:
+                        event = keyboard.read_event()
+
+                        if event.event_type != keyboard.KEY_DOWN:
+                            continue
+                    
+                        if keyboard.is_pressed("alt") or keyboard.is_pressed("left alt") or keyboard.is_pressed("right alt"):
+                            if event.name == "x" or event.name == "X": 
+                                break                
+
+                    cli.clear_screen()
+                    cli.flush_input()
                     load("Returning")
                     cli.clear_screen()
                     first = True
 
-            case 6: 
-                print()
-                load("Quitting")
-                exit()
-            case _:
-                raise ValueError("Invalid operation.")
+                case 5:
+                    cli.clear_screen()
+                    load("Removing Data")
+
+                    deleted_count = 0
+
+                    try:
+                        deleted_count = nm.remove_data()
+                    except (DataRemoveError, Exception) as e:
+                        cli.red(f"Data Removal Failed: {e}")
+                    else:
+                        # removal successful
+                        print(cli.green(f"{deleted_count}") + " note files deleted.")
+                        time.sleep(3)
+                    finally:
+                        load("Returning")
+                        cli.clear_screen()
+                        first = True
+
+                case 6: 
+                    print()
+                    load("Quitting")
+                    exit()
+                case _:
+                    raise ValueError("Invalid operation.")
+    except KeyboardInterrupt:
+        cli.clear_screen()
+        load("Quitting", red=True)      
+        cli.clear_screen()
+        exit() 
 
 def _handle_update_failure(e):
         cli.clear_screen()
@@ -381,11 +387,14 @@ def open_note_file(id):
                 note_lines[-1] += " "
 
 
-def load(msg):
-    print(f"{msg}", end="", flush=True)
+def load(msg, red=False):
+    m = cli.red(msg) if red else msg
+    dot = cli.red(".") if red else "."
+
+    print(m, end="", flush=True)
     for _ in range(3):
         time.sleep(0.5)
-        print(".", end="", flush=True)
+        print(dot, end="", flush=True)
 
     time.sleep(0.5)
     print()  

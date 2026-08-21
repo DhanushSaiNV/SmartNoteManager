@@ -60,7 +60,7 @@
  - TESTING:
      - Test userflow, UIUX.
         - [DONE] When entered non int value for opcode.
-        - Create load(Terminating) if KeyboardInterrupt.
+        - [DONE] Create load(Terminating) if KeyboardInterrupt.
         - Make sure user's navigation to main main menu from several menus is working well.
         - improve navigation hint colors.
 
