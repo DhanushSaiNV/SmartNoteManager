@@ -12,6 +12,7 @@ import re
 
 from . import cli, utils
 from .exceptions import *
+from .sample_data import SAMPLE_NOTES
 
 """
 TODO: Implement note search
@@ -29,6 +30,14 @@ class NoteManager:
         self.NOTES_DIR.mkdir(parents=True, exist_ok=True)
         self.TEMP_DIR.mkdir(parents=True, exist_ok=True)
         self.BACKUPS_DIR.mkdir(parents=True, exist_ok=True)
+
+        if not any(self.NOTES_DIR.glob("*.json")):
+            self._seed_sample_notes()
+
+
+    def _seed_sample_notes(self):
+        for title, tag, note_data in SAMPLE_NOTES:
+            self.create_note(note_data=note_data, tag=tag, title=title)
 
 
     OPTS, OPTS_L = cli.get_opts()

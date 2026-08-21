@@ -69,6 +69,7 @@ SmartNoteManager/
 │       ├── exceptions.py       # Custom exception definitions
 │       ├── log.py              # Debug logging helper
 │       ├── note_manager.py     # Core CRUD, file storage & backup logic
+│       ├── sample_data.py      # Default sample notes data
 │       ├── stats.py            # Stats dataclass
 │       ├── utils.py            # Datetime & text formatting helpers
 │       └── window.py           # Sliding window pagination algorithm
