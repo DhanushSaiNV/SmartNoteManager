@@ -143,7 +143,11 @@ class NoteManager:
         
         notes = self._get_all_notes()
 
-        pattern = re.compile(rf"({"|".join(phrases)})", re.IGNORECASE)
+
+        pattern = re.compile(
+            rf"({'|'.join(re.escape(phrase) for phrase in phrases)})",
+            re.IGNORECASE
+        )
 
 
         if len(phrases) == 0 or phrases[0] == "":
