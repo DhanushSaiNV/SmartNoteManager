@@ -67,6 +67,8 @@ class Window:
 
     @property
     def curr_value(self):
+        if not len(self._list) or not self._list:
+            return None
         return self._list[self._curr - 1]
 
 

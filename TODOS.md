@@ -76,7 +76,7 @@
 
              => REASON: The prev is not being updated correctly.
              
-        - when there are no notes: click enter to open and handle error.
+        - [DONE] when there are no notes: click enter to open and handle error.
         - test navigation up/down
         - test opening of the notes
             - Test update_note()

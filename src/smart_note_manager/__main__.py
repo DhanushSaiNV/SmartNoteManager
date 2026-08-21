@@ -227,14 +227,19 @@ def main():
 
                                 case "enter":
                                     if not len(state["matched_notes"]) >= 1:
-                                        pass
+                                        continue
 
                                     cli.clear_screen()
                                     cli.restore_cursor()
                                     load("Opening Note")
 
                                     # Open file, and when want to quit, use return_to_menu()
-                                    open_note_file(window.curr_value["id"])
+                                    curr_note = window.curr_value
+
+                                    if curr_note == None or not curr_note:
+                                        continue
+
+                                    open_note_file(curr_note["id"])
                                 case _:
                                     pass
 
