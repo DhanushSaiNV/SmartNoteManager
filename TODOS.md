@@ -58,11 +58,11 @@
             - load(Quitting)
             - exit()
  - TESTING:
-     - Test userflow, UIUX.
+     - [DONE] Test userflow, UIUX.
         - [DONE] When entered non int value for opcode.
         - [DONE] Create load(Terminating) if KeyboardInterrupt.
-        - Make sure user's navigation to main main menu from several menus is working well.
-        - improve navigation hint colors.
+        - [DONE] Make sure user's navigation to main main menu from several menus is working well.
+        - [DONE] improve navigation hint colors.
 
      - Test create_note()
         - fix: ALT X and ALT S same functionality

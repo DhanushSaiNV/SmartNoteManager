@@ -330,7 +330,7 @@ def open_note_file(id):
 
     title_tag = (title.title() + ((" - " + tag) if len(tag) else ""))
     centered_title = f"  {title_tag:<{int(terminal_width)}}"
-    right_aligned_shortcuts = cli.make_dim(f"  ALT + X to exit. ALT + S to save.")
+    right_aligned_shortcuts = f" [ " + cli.red("ALT + X") + " to exit. ]" + "[ " + cli.green("ALT + S") + " to save. ]"
     header = f"\n{cli.REVERSE}{cli.brand_color(centered_title)}{cli.RESET}"
     hint = f"{right_aligned_shortcuts:<{terminal_width}}"
 
