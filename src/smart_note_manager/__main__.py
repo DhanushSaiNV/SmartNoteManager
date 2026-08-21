@@ -269,8 +269,8 @@ def main():
                         cli.red(f"Data Removal Failed: {e}")
                     else:
                         # removal successful
-                        print(cli.green(f"{deleted_count}") + " note files deleted.")
-                        time.sleep(3)
+                        print(cli.red(f"{deleted_count}") + " note files deleted.")
+                        time.sleep(1)
                     finally:
                         load("Returning")
                         cli.clear_screen()
@@ -278,7 +278,7 @@ def main():
 
                 case 6: 
                     print()
-                    load("Quitting")
+                    load("Quitting", red=True)
                     exit()
                 case _:
                     raise ValueError("Invalid operation.")
