@@ -65,11 +65,13 @@
         - improve navigation hint colors.
 
      - Test create_note()
+        - fix: ALT X and ALT S same functionality
         - when entered empy note, title or tag
         - when used characters like (" , \n , \t and other escape sequences) in note data: would that effect note storing, as we are storing it in json.
 
      - Test search_note()
-        - when there are no notes
+        - Fix: updating search inp isn't effecting the search results.
+        - when there are no notes: click enter to open and handle error.
         - test navigation up/down
         - test opening of the notes
             - Test update_note()

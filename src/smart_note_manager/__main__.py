@@ -35,7 +35,18 @@ def main():
                     time.sleep(1)
                     cli.clear_screen() 
 
-                    title, tag, note = process_create_req()
+                    title, tag, note, save_quit = process_create_req()
+
+                    if save_quit == "quit":
+
+                        cli.clear_screen()
+                        load("Returning")
+                        cli.clear_screen()
+
+                        cli.flush_input()
+                        first = True
+                        
+                        continue
                     
                     try:
                         note_file_name, note_file_path = nm.create_note(note, tag, title)
@@ -409,7 +420,7 @@ def return_to_menu():
     cli.clear_screen()
 
     
-def process_create_req() -> tuple[str, str, str]:
+def process_create_req() -> tuple[str, str, str, str]:
 
     note_lines = ['']
     title = ""
@@ -421,7 +432,9 @@ def process_create_req() -> tuple[str, str, str]:
             cli.clear_screen()
     
             print(cli.bold_underlined("New Note"))
-            print(cli.make_dim("Start writing your note, Press ") + cli.bold("CTRL + C ") + cli.make_dim("when completed."))
+            save_hint = cli.make_dim("[ ") + cli.green("ALT + S ") + cli.make_dim("to save.") + cli.make_dim(" ]")
+            quit_hint = cli.make_dim("[ ") + cli.red("ALT + X") + cli.make_dim(" to quit. ]")
+            print(save_hint + quit_hint)
     
             # make an editor    
             for line_number, line in enumerate(note_lines, start=1):
@@ -440,13 +453,15 @@ def process_create_req() -> tuple[str, str, str]:
             if keyboard.is_pressed("alt") or keyboard.is_pressed("left alt") or keyboard.is_pressed('right alt'):
                 if event.name == "s":
                     # time.sleep(0.2)
-    
-                    # cli.clear_screen()
+
+
                     print("\n")
-                    break
+                    load("Saving")
+                    cli.flush_input()
+                    break 
     
                 elif event.name == "x":
-                    break
+                    return "", "", "",  "quit"
                 continue
     
             if keyboard.is_modifier(event.scan_code):
@@ -491,7 +506,7 @@ def process_create_req() -> tuple[str, str, str]:
 
     note_str = "\n".join(note_lines)
 
-    return title, tag, note_str
+    return title, tag, note_str, "save"
 
 
 
