@@ -81,7 +81,8 @@ def main():
                     search_phrases = []
                     phrase = ""
 
-                    help_text = cli.make_dim(f"[Search phrases in title or content — separate with commas.]" + f" {cli.bold("Press Esc when finished.")}")
+                    esc_str = cli.red("ESC")
+                    help_text = cli.make_dim(f"[Search phrases in title or content — separate with commas.]") + f" Press {esc_str} to quit."
                     prompt_text = cli.brand_color("Search: ")
                         
                     cli.save_cursor()
@@ -165,6 +166,9 @@ def main():
                                     cli.clear_screen()
                                     cli.restore_cursor()
                                     first = True
+                                    cli.clear_screen()
+                                    load("Returning")
+                                    cli.clear_screen()
                                     break
 
                                 case "up":
