@@ -77,17 +77,17 @@
              => REASON: The prev is not being updated correctly.
              
         - [DONE] when there are no notes: click enter to open and handle error.
-        - test navigation up/down
-        - test opening of the notes
-            - Test update_note()
+        - [DONE] test navigation up/down
+        - [DONE] test opening of the notes
+            - [DONE] Test update_note()
                 - test empty note entry
                 - test ", \n, \t 
-        - test search algo efficiency. With known notes data.
+        - [DONE] test search algo efficiency. With known notes data.
 
-     - Test remove_data()
+     - [DONE] Test remove_data()
         - when no data 
         
-     - Test export_data()
+     - [DONE] Test export_data()
         - test and improve export data text formatting.
     
-     - Test quit() UIUX
+     - [DONE] Test quit() UIUX

@@ -245,18 +245,19 @@ class NoteManager:
 
         return note_data
 
-
     def _json_to_str(self, data):
-        title = data.get("title", "")
-        tag = data.get("tag","untagged")
-        note = data.get("note", "")
+        title = str(data.get("title", "")).strip()
+        tag = str(data.get("tag", "untagged")).strip()
+        note = str(data.get("note", "")).strip()
 
-        s = f"Title: {str(title).title()}\n"
-        s += f"Tag: {str(tag).upper()}\n\n"
-        s += f"Note: {str(note).capitalize()}\n\n"
-        s += f"{"-" * 10}\n\n"
-
-        return s
+        return (
+            f"{'=' * 50}\n"
+            f"{title}\n"
+            f"{'=' * 50}\n\n"
+            f"Tag: {tag}\n\n"
+            f"{note}\n"
+            f"{'-' * 50}\n\n"
+        )
 
     def export_data(self):
         # Iterate through all data files

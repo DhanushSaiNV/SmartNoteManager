@@ -341,7 +341,7 @@ def main():
 
 def _handle_update_failure(e):
         cli.clear_screen()
-        print(e)
+        print(cli.red(e))
 
 def save_note(id, note_data, note_lines):
     cli.clear_screen()
@@ -416,8 +416,9 @@ def open_note_file(id):
 
                 is_saved = save_note(id, note_data, note_lines)
                 if not is_saved:
-                    cli.red("Failed to save.")
+                    print(cli.red("Failed to save."))
                     time.sleep(3)
+                    load("Returning", red=True)
                 break
 
             elif event.name == "x":
