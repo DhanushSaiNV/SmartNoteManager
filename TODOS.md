@@ -70,7 +70,12 @@
         - [DONE] when used characters like (" , \n , \t and other escape sequences) in note data: would that effect note storing, as we are storing it in json.
 
      - Test search_note()
-        - Fix: updating search inp isn't effecting the search results.
+        - [DONE] Fix: updating search inp isn't effecting the search results.
+             - prev is not updating properly.
+             - new window is only being created when the matchednotes size is increased than prev, but not less than prev.
+
+             => REASON: The prev is not being updated correctly.
+             
         - when there are no notes: click enter to open and handle error.
         - test navigation up/down
         - test opening of the notes

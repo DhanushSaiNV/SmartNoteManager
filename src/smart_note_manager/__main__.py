@@ -7,7 +7,7 @@ from .log import log
 from .stats import Stats
 
 DEBUG = False
-LOG = False
+LOG = True
 
 nm = NoteManager()
 
@@ -78,28 +78,26 @@ def main():
 
                     cli.clear_screen()
 
-                    search_phrases = []
                     phrase = ""
 
                     esc_str = cli.red("ESC")
                     help_text = cli.make_dim(f"[Search phrases in title or content — separate with commas.]") + f" Press {esc_str} to quit."
-                    prompt_text = cli.brand_color("Search: ")
                         
                     cli.save_cursor()
-                    matched_notes, match_stats = None, None
 
                     state = {
                         "phrase": "", 
                         "matched_notes": [],
                     }
 
-                    curr_note = 1
-
                     first_iter = True
                     prev_notes = []
                     should_create_new_window = lambda prev, curr, first_iter: first_iter or prev != curr
 
                     search_box_height, note_height = 4, 5
+
+                    if LOG:
+                        log_str = ""
 
                     while True:
                         # DEBUG:
@@ -108,17 +106,40 @@ def main():
                         
                         if should_create_new_window(prev_notes, state['matched_notes'], first_iter):
                             window = Window(1, search_box_height, note_height, state["matched_notes"], LOG)
+                            if LOG:
+                                with open("debug3.txt", "w") as f:
+                                    f.write("New window is created.\n")
+                                    f.write(str(window))
                             first_iter = False
+                        else:
+                            if LOG:
+                                with open("debug3.txt", "w") as f:
+                                    f.write("")
 
                         # reset curr_note if: curr_note exceeds matched_notes OR curr_note is not set even matched_notes are existing.
                         if not window.curr <= len(state["matched_notes"]) or (len(state["matched_notes"]) and not window.curr >= 1 ) :
+                            if LOG:
+                                log_str = f"new window is created\n\n"
+                                log_str += f"window curr is greater than matched notes len\n" if not window.curr <= len(state["matched_notes"]) else ""
+                                log_str += f"window curr < 1 ({window.curr}) [{str(window._list)}] even if len(matched notes) is {len(state['matched_notes'])}" if len(state["matched_notes"]) and not window.curr >= 1 else ""
+                                log_str += f"\nprev: {str([v["id"][:3] for v in prev_notes])}"
+                                log_str += f"\ncurr_matched_notes: {str([v["id"][:3] for v in state['matched_notes']])}"
+
                             window = Window(1, search_box_height, note_height, state["matched_notes"], LOG)
 
 
                         cli.clear_screen()
                         cli.render_notes(notes_data=window.values, sl_no_beg=window.low, curr=window.curr)
                         cli.save_cursor()
-                            
+
+                        if LOG:
+                            with open("debug.txt", "w") as f:
+                                f.write("\n")
+                                f.write(f"prev: {str([v["id"][:3] for v in prev_notes])}")
+                                f.write("\nMatched: " + str([v["id"][:3] for i,v in enumerate(state["matched_notes"], start=1)]))
+                                # f.write("\nDisplaying: " + str([v["id"][:3] for i,v in enumerate(window.values, start=1)]) + "\n")
+                                f.write(log_str or "\n")
+                                f.write("\n" + "-" * 15 + "\n")
 
                         cli.draw_bottom_search_box(prompt_label=f"Search: {state.get("phrase")}", help_text=help_text)
 
@@ -130,36 +151,41 @@ def main():
                                 print(event.name, end="", flush=True)
                                 state["phrase"] += str(event.name).strip()
 
-                                state["matched_notes"] = []
-                                state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
-
                                 prev_notes = state["matched_notes"]
 
+                                state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
+
+
                                 cli.restore_cursor()
+                                continue
 
                             match(event.name):
                                 case "backspace":
                                     phrase = state["phrase"]
                                     state["phrase"] = phrase[:len(phrase) - 1]
+                                    prev_notes = state["matched_notes"]
+
                                     state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
 
-                                    prev_notes = state["matched_notes"]
                                     continue
 
                                 case "space":
                                     phrase = state["phrase"]
                                     state["phrase"] += " "
+                                    prev_notes = state['matched_notes']
+
                                     state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
 
-                                    prev_notes = state['matched_notes']
                                     continue
 
                                 case "tab":
                                     phrase = state["phrase"]
                                     state["phrase"] += "    "
-                                    state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
 
                                     prev_notes = state["matched_notes"]
+
+                                    state["matched_notes"], match_stats = nm.search_note(state["phrase"])                            
+
                                     continue
 
                                 case "esc":
@@ -172,12 +198,18 @@ def main():
                                     break
 
                                 case "up":
-                                    window.backward()
+                                    _, curr = window.backward()
+                                    if LOG:
+                                        with open("debug2.txt", "w") as f:
+                                            f.write(f"\nwindow curr: {curr}")
 
                                 case "down":
                                     # if (not curr_note == len(state["matched_notes"])) and (len(state["matched_notes"]) > 1):
                                     if len(state["matched_notes"]) > 1:
-                                        window.forward()
+                                        _, curr = window.forward()
+                                        with open("debug2.txt", "w") as f:
+                                            f.write(f"\nwindow curr: {curr}")
+
 
                                 case "enter":
                                     if not len(state["matched_notes"]) >= 1:
