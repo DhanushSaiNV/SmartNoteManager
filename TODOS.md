@@ -21,7 +21,7 @@
 
  - [DONE] TEST: Window: what happens if the list size is less than window size
 
- - TODO: 
+ - [DONE] TODO: 
      - Complete other funcs: stats, export, delete data, quit
         1. [DONE] Stats:
             - Total Numeber of notes: len(notes)
@@ -57,3 +57,32 @@
         5. [DONE] Quit:
             - load(Quitting)
             - exit()
+ - TESTING:
+     - Test userflow, UIUX.
+        - [DONE] When entered non int value for opcode.
+        - [DONE] Create load(Terminating) if KeyboardInterrupt.
+        - Make sure user's navigation to main main menu from several menus is working well.
+        - improve navigation hint colors.
+
+     - Test create_note()
+        - fix: ALT X and ALT S same functionality
+        - when entered empy note, title or tag
+        - when used characters like (" , \n , \t and other escape sequences) in note data: would that effect note storing, as we are storing it in json.
+
+     - Test search_note()
+        - Fix: updating search inp isn't effecting the search results.
+        - when there are no notes: click enter to open and handle error.
+        - test navigation up/down
+        - test opening of the notes
+            - Test update_note()
+                - test empty note entry
+                - test ", \n, \t 
+        - test search algo efficiency. With known notes data.
+
+     - Test remove_data()
+        - when no data 
+        
+     - Test export_data()
+        - test and improve export data text formatting.
+    
+     - Test quit() UIUX
