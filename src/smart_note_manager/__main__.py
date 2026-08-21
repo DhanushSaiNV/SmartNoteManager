@@ -511,6 +511,8 @@ def process_create_req() -> tuple[str, str, str, str]:
 
     cli.flush_input()
 
+    print()
+
     while True:
         title = input(cli.bold(f"Enter Title{cli.red("*")}: ")).strip()
 
@@ -519,6 +521,7 @@ def process_create_req() -> tuple[str, str, str, str]:
             continue
 
         tag = input(cli.bold("Enter tag: ")).strip()
+        print()
         break
 
     note_str = "\n".join(note_lines)

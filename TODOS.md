@@ -64,10 +64,10 @@
         - [DONE] Make sure user's navigation to main main menu from several menus is working well.
         - [DONE] improve navigation hint colors.
 
-     - Test create_note()
-        - fix: ALT X and ALT S same functionality
-        - when entered empy note, title or tag
-        - when used characters like (" , \n , \t and other escape sequences) in note data: would that effect note storing, as we are storing it in json.
+     - [DONE] Test create_note()
+        - [DONE] fix: ALT X and ALT S same functionality
+        - [DONE] when entered empy note, title or tag
+        - [DONE] when used characters like (" , \n , \t and other escape sequences) in note data: would that effect note storing, as we are storing it in json.
 
      - Test search_note()
         - Fix: updating search inp isn't effecting the search results.
